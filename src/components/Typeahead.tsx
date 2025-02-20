@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
- 
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
- 
+
 const frameworks = [
   {
     value: "next.js",
@@ -38,18 +38,21 @@ const frameworks = [
     label: "Astro",
   },
 ]
- 
+
 export default function TypeaheadSelect() {
   const [open, setOpen] = useState(false)
   const [options, setOptions] = useState(frameworks);
-  const [value, setValue] = useState("")
- 
-  const handleSelect = (selectedValue: string) => {
-    if (!options.find(option => option.value == selectedValue)) {
-      setOptions([...options, { value: selectedValue, label: selectedValue }]); // Add new value to options
+  const [needle, setNeedle] = useState<string>("");
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const toggleSelection = (value: string) => {
+    if (!options.find(option => option.value == value)) {
+      setOptions([...options, { value, label: value }]); // Add new value to options
     }
-    setValue(selectedValue);
-    setOpen(false);
+
+    setSelected((prev) =>
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
+    );
   };
 
   return (
@@ -61,19 +64,18 @@ export default function TypeaheadSelect() {
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          {value
-            ? options.find((framework) => framework.value === value)?.label
-            : "Select PLACEHOLDER..."}
+          BOOP
+
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command children={[
-          
+
           <CommandInput
-            placeholder="Search or type..."
-            value={value}
-            onValueChange={setValue}
+            placeholder="Search options..."
+            value={needle}
+            onValueChange={setNeedle}
           />,
 
           <CommandList>
@@ -81,33 +83,29 @@ export default function TypeaheadSelect() {
               <Button
                 variant="ghost"
                 className="w-full"
-                onClick={() => handleSelect(value)}
-              >
-                Create "{value}"
+                onClick={() => toggleSelection(needle)}>
+                Add custom option, "{needle}"
               </Button>
-              No framework found.</CommandEmpty>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={(currentValue: string) => {
-                    setValue(currentValue === value ? "" : currentValue)
-                    setOpen(false)
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === option.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option.label}
-                </CommandItem>
-              ))}
+            </CommandEmpty>
+            {options.map((option) => (
+              <CommandItem
+                key={option.value}
+                value={option.value}
+                onSelect={() => toggleSelection(option.value)}
+              >
+                <Check
+                  className={cn(
+                    "mr-2 h-4 w-4",
+                    selected.includes(option.value) ? "opacity-100" : "opacity-0",
+                  )}
+                />
+                {option.label}
+              </CommandItem>
+            ))}
           </CommandList>,
 
-        ]}/>
+        ]} />
       </PopoverContent>
     </Popover>
-    );
-  }
+  );
+}

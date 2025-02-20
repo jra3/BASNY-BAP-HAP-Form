@@ -133,19 +133,6 @@ export default function MemberForm() {
           </CardHeader>
           <CardContent className="space-y-4">
 
-            <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Water Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {["Fresh", "Brackish", "Salt"].map((waterType) => (
-                  <SelectItem key={waterType} value={waterType}>
-                    {waterType}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
             <Select onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} value={formData.speciesType}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Species Type" />
@@ -154,6 +141,19 @@ export default function MemberForm() {
                 {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
                   <SelectItem key={speciesType} value={speciesType}>
                     {speciesType}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Water Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {["Fresh", "Brackish", "Salt"].map((waterType) => (
+                  <SelectItem key={waterType} value={waterType}>
+                    {waterType}
                   </SelectItem>
                 ))}
               </SelectContent>
