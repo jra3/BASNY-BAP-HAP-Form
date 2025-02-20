@@ -89,6 +89,10 @@ export default function MemberForm() {
     substrateType: "",
     substrateDepth: "",
     substrateColor: "",
+
+    CO2: false,
+    CO2Description: "",
+    ferts: [["", ""]]
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -336,6 +340,86 @@ export default function MemberForm() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+
+          <CardHeader>
+            <CardTitle>Fertilizers & Supplements</CardTitle>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            {
+              formData.ferts.map((fert, index) => {
+                const [substance, regimen] = fert;
+
+                const handleFertChange = (x: number, y: number) => {
+                  return (e: React.ChangeEvent<HTMLInputElement>) => {
+                    const ferts = formData.ferts;
+                    ferts[x][y] = e.target.value;
+                    setFormData({ ...formData, ferts });
+                  };
+                }
+
+                return <>
+                  <div className="flex">
+                    <Input
+                      placeholder="Fertilizer / Supplement"
+                      value={substance}
+                      onChange={handleFertChange(index, 0)}
+                    />
+                    <Input
+                      placeholder="How much / How often"
+                      value={regimen}
+                      onChange={handleFertChange(index, 1)}
+                    />
+                    <a onClick={(e) => {
+                      const poop = formData.ferts.splice(index, 1);
+                      console.log(poop, formData.ferts);
+                      setFormData({ ...formData });
+                    }}>
+                      -
+                    </a>
+                  </div>
+                </>
+              })
+            }
+
+            <a onClick={(e) => {
+              const ferts = formData.ferts;
+              setFormData({ ...formData, ferts: [...ferts, ["", ""]] });
+            }}>
+              Add+
+            </a>
+
+            <div className='flex items-center space-x-3'>
+              <Label className='text-left'>CO2?</Label>
+              <RadioGroup
+                onValueChange={(value) => setFormData({ ...formData, CO2: value === "Yes" })}
+                className="flex space-y-1"
+                defaultValue="No">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Yes" id="yes-co2" />
+                  <Label htmlFor="yes-co2">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="No" id="no-co2" />
+                  <Label htmlFor="no-co2">No</Label>
+                </div>
+              </RadioGroup>
+
+              {formData.CO2 && (
+                <Input
+                  name="CO2Description"
+                  placeholder="Describe CO2 supplementation"
+                  value={formData.CO2Description}
+                  onChange={handleChange}
+                />)
+              }
+            </div>
+
+          </CardContent>
+        </Card>
+
 
         <Button className="w-full" type="button" onClick={handlePrint}>
           Print Form
