@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -76,6 +76,19 @@ export default function MemberForm() {
     speciesLatinName: "",
     speciesCommonName: "",
     date: "",
+    count: "",
+
+    tankSize: "",
+    filterType: "",
+    changeVolume: "",
+    changeFrequency: "",
+    temperature: "",
+    pH: "",
+    GH: "",
+    specificGravity: "",
+    substrateType: "",
+    substrateDepth: "",
+    substrateColor: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,86 +114,228 @@ export default function MemberForm() {
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-2xl">
       <h2 className="text-2xl font-semibold mb-4 text-center">Member Form</h2>
       <form className="space-y-4">
+
         <Input
           name="memberName"
           placeholder="Member Name"
           value={formData.memberName}
           onChange={handleChange}
         />
+        <Card>
+          <CardHeader>
+            <CardTitle>Species Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
 
-        <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Water Type" />
-          </SelectTrigger>
-          <SelectContent>
-            {["Fresh", "Brackish", "Salt"].map((waterType) => (
-              <SelectItem key={waterType} value={waterType}>
-                {waterType}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>    
+            <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Water Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {["Fresh", "Brackish", "Salt"].map((waterType) => (
+                  <SelectItem key={waterType} value={waterType}>
+                    {waterType}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-        <div>
-          <Label className="block font-light mb-2">Category:</Label>
-          <RadioGroup defaultValue={"Fish"} onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} className="flex gap-4">
+            <Select onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} value={formData.speciesType}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Species Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
+                  <SelectItem key={speciesType} value={speciesType}>
+                    {speciesType}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={value => setFormData({ ...formData, classification: value })} value={formData.classification}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Class" />
+              </SelectTrigger>
+              <SelectContent>
+                {(SpeciesTypesAndClasses[formData.speciesType] ?? []).map((classType) => (
+                  <SelectItem key={classType} value={classType}>
+                    {classType}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Input
+              name="speciesCommonName"
+              placeholder="Species Common Name"
+              value={formData.speciesCommonName}
+              onChange={handleChange}
+            />
+
+            <Input
+              name="speciesLatinName"
+              placeholder="Species Latin Name"
+              value={formData.speciesLatinName}
+              onChange={handleChange}
+            />
+
+            <div className="flex items-center space-x-3">
+              <Label className="font-light w-60 text-right">{
+                (function () {
+                  switch (formData.speciesType) {
+                    case "Fish":
+                    case "Invert":
+                      return "Date Spawned:";
+                    case "Plant":
+                    case "Coral":
+                      return "Date Propagated:";
+                  }
+                })()
+              }
+              </Label>
+
+              <Input
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+              />
+            </div>
+
             {
-              Object.keys(SpeciesTypesAndClasses).map((speciesType, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <RadioGroupItem value={speciesType} id={`r${index}`} />
-                  <Label htmlFor={`r${index}`}>{speciesType}</Label>
-                </div>          
-              ))
+              (function () {
+                switch (formData.speciesType) {
+                  case "Fish":
+                  case "Invert":
+                    return <>
+                      <Input
+                        name="count"
+                        placeholder="Number Of Fry"
+                        value={formData.count}
+                        onChange={handleChange}
+                      />
+
+                      <Input
+                        name="foods"
+                        placeholder="Foods Fed"
+                        value={formData.count}
+                        onChange={handleChange}
+                      />
+
+                      <Input
+                        name="foods"
+                        placeholder="Species Bred On/In"
+                        value={formData.count}
+                        onChange={handleChange}
+                      />
+                    </>
+                  case "Plant":
+                  case "Coral":
+                    return <>
+                      <Input
+                        name="propagationMethod"
+                        placeholder="Method Of Propagation"
+                        value={formData.count}
+                        onChange={handleChange}
+                      />
+                    </>
+
+                }
+              })()
             }
-          </RadioGroup>
-        </div>
 
-        <Select onValueChange={value => setFormData({ ...formData, classification: value })} value={formData.classification}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Class" />
-          </SelectTrigger>
-          <SelectContent>
-            {(SpeciesTypesAndClasses[formData.speciesType] ?? []).map((classType) => (
-              <SelectItem key={classType} value={classType}>
-                {classType}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>        
+          </CardContent>
+        </Card>
 
-        <Input
-          name="speciesCommonName"
-          placeholder="Species Common Name"
-          value={formData.speciesCommonName}
-          onChange={handleChange}
-        />
+        <Card>
 
-        <Input
-          name="speciesLatinName"
-          placeholder="Species Latin Name"
-          value={formData.speciesLatinName}
-          onChange={handleChange}
-        />
+          <CardHeader>
+            <CardTitle>Tank Details</CardTitle>
+          </CardHeader>
 
-        <Label className="block font-semibold">{
-          (function () {
-            switch (formData.speciesType) {
-              case "Fish":
-              case "Invert":
-                return "Date Spawned:";
-              case "Plant":
-                return "Date Propagated / Started:";
-              case "Coral":
-                return "Date Propagated:";
-            }
-          })()
-        }</Label>
-        <Input
-          name="date"
-          type="date"
-          value={formData.date}
-          onChange={handleChange}
-        />
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+
+              <Input
+                name="tankSize"
+                placeholder="Tank Size"
+                value={formData.tankSize}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="filterType"
+                placeholder="Filter Type"
+                value={formData.filterType}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="changeVolume"
+                placeholder="Water Change Volume (%)"
+                value={formData.changeVolume}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="changeFrequency"
+                placeholder="Water Change Frequency"
+                value={formData.changeFrequency}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="temperature"
+                placeholder="Temperature"
+                value={formData.temperature}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="pH"
+                placeholder="pH"
+                value={formData.pH}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="GH"
+                placeholder="Hardness (GH)"
+                value={formData.GH}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="specificGravity"
+                placeholder="Specific Gravity"
+                value={formData.specificGravity}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="substrateType"
+                placeholder="Substrate Type"
+                value={formData.substrateType}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="substrateDepth"
+                placeholder="Substrate Depth"
+                value={formData.substrateDepth}
+                onChange={handleChange}
+              />
+
+              <Input
+                name="substrateColor"
+                placeholder="Substrate Color"
+                value={formData.substrateColor}
+                onChange={handleChange}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         <Button className="w-full" type="button" onClick={handlePrint}>
           Print Form
