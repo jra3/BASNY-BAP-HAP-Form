@@ -77,6 +77,8 @@ export default function MemberForm() {
     speciesCommonName: "",
     date: "",
     count: "",
+    foods: [],
+    spawnLocations: [],
 
     tankSize: "",
     filterType: "",
@@ -222,15 +224,15 @@ export default function MemberForm() {
 
                       <Input
                         name="foods"
-                        placeholder="Foods Fed"
-                        value={formData.count}
+                        placeholder="TODO multiselect Foods Fed"
+                        value={formData.foods}
                         onChange={handleChange}
                       />
 
                       <Input
-                        name="foods"
-                        placeholder="Species Bred On/In"
-                        value={formData.count}
+                        name="spawnLocations"
+                        placeholder="TODO multiselect Species Bred On/In"
+                        value={formData.spawnLocations}
                         onChange={handleChange}
                       />
                     </>
