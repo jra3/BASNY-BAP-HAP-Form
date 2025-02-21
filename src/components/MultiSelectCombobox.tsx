@@ -43,6 +43,8 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
     attrs.onChange?.(selected);
   };
 
+  const weight = selected.length > 0 ? "font-medium" : "font-light";
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -50,7 +52,11 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn(
+            "w-full",
+            "justify-between",
+            weight,
+          )}
         >
           {selected.map(
             value => {

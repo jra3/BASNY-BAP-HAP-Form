@@ -7,6 +7,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import MultiSelectCombobox from './components/MultiSelectCombobox';
+import { Separator } from './components/ui/separator';
 
 const SpeciesTypesAndClasses: Record<string, string[]> = {
   "Fish": [
@@ -80,6 +81,7 @@ export default function MemberForm() {
     count: "",
     foods: [] as string[],
     spawnLocations: [] as string[],
+    propagationMethod: "",
 
     tankSize: "",
     filterType: "",
@@ -96,6 +98,9 @@ export default function MemberForm() {
     CO2: false,
     CO2Description: "",
     ferts: [["", ""]],
+    lightType: "",
+    lightStrength: "",
+    lightHours: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +124,7 @@ export default function MemberForm() {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-2xl">
-      <h2 className="text-2xl font-semibold mb-4 text-center">Member Form</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-center">BAP/HAP Submission</h2>
       <form className="space-y-4">
 
         <Input
@@ -134,31 +139,33 @@ export default function MemberForm() {
           </CardHeader>
           <CardContent className="space-y-4">
 
-            <Select onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} value={formData.speciesType}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Species Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
-                  <SelectItem key={speciesType} value={speciesType}>
-                    {speciesType}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className='flex'>
+              <Select onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} value={formData.speciesType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Species Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
+                    <SelectItem key={speciesType} value={speciesType}>
+                      {speciesType}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Water Type" />
-              </SelectTrigger>
-              <SelectContent>
-                {["Fresh", "Brackish", "Salt"].map((waterType) => (
-                  <SelectItem key={waterType} value={waterType}>
-                    {waterType}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Water Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["Fresh", "Brackish", "Salt"].map((waterType) => (
+                    <SelectItem key={waterType} value={waterType}>
+                      {waterType}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <Select onValueChange={value => setFormData({ ...formData, classification: value })} value={formData.classification}>
               <SelectTrigger className="w-full">
@@ -188,7 +195,7 @@ export default function MemberForm() {
             />
 
             <div className="flex items-center space-x-3">
-              <Label className="font-light w-60 text-right">{
+              <Label className="w-60 text-right font-bold">{
                 (function () {
                   switch (formData.speciesType) {
                     case "Fish":
@@ -246,7 +253,7 @@ export default function MemberForm() {
                       <Input
                         name="propagationMethod"
                         placeholder="Method Of Propagation"
-                        value={formData.count}
+                        value={formData.propagationMethod}
                         onChange={handleChange}
                       />
                     </>
@@ -277,14 +284,6 @@ export default function MemberForm() {
               <Input
                 name="filterType"
                 placeholder="Filter Type"
-                /* suggestions={[
-                  "Sponge",
-                  "Hang On Back",
-                  "Canister",
-                  "Internal",
-                  "Undergravel",
-                  "None",
-                ]} */
                 value={formData.filterType}
                 onChange={handleChange}
               />
@@ -351,102 +350,126 @@ export default function MemberForm() {
                 value={formData.substrateColor}
                 onChange={handleChange}
               />
+
+              {["Plant", "Coral"].includes(formData.speciesType) &&
+                <>
+                  <Input
+                    name="lightType"
+                    placeholder="Type Of Light"
+                    value={formData.lightType}
+                    onChange={handleChange}
+                  />
+
+                  <Input
+                    name="lightStrength"
+                    placeholder="Wattage / PAR"
+                    value={formData.lightStrength}
+                    onChange={handleChange}
+                  />
+
+                  <Input
+                    name="lightHours"
+                    placeholder="Light Hours"
+                    value={formData.lightHours}
+                    onChange={handleChange}
+                  />
+                </>}
+
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        {
+          ["Plant", "Coral"].includes(formData.speciesType) &&
+          <Card>
+            <CardHeader>
+              <CardTitle>Fertilizers & Supplements</CardTitle>
+            </CardHeader>
 
-          <CardHeader>
-            <CardTitle>Fertilizers & Supplements</CardTitle>
-          </CardHeader>
+            <CardContent className="space-y-4">
+              {
+                formData.ferts.map((fert, index) => {
+                  const [substance, regimen] = fert;
 
-          <CardContent className="space-y-4">
-            {
-              formData.ferts.map((fert, index) => {
-                const [substance, regimen] = fert;
+                  const handleFertChange = (x: number, y: number) => {
+                    return (e: React.ChangeEvent<HTMLInputElement>) => {
+                      const ferts = formData.ferts;
+                      ferts[x][y] = e.target.value;
+                      setFormData({ ...formData, ferts });
+                    };
+                  }
 
-                const handleFertChange = (x: number, y: number) => {
-                  return (e: React.ChangeEvent<HTMLInputElement>) => {
-                    const ferts = formData.ferts;
-                    ferts[x][y] = e.target.value;
-                    setFormData({ ...formData, ferts });
-                  };
-                }
-
-                return <div className="flex" key={`fert${index}`}>
-                  <Input
-                    placeholder="Fertilizer / Supplement"
-                    value={substance}
-                    onChange={handleFertChange(index, 0)}
-                  />
-                  <Input
-                    placeholder="How much / How often"
-                    value={regimen}
-                    onChange={handleFertChange(index, 1)}
-                  />
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      formData.ferts.splice(index, 1);
-                      setFormData({ ...formData });
-                    }}>
-                    Remove
-                  </Button>
-                </div>
-              })
-            }
-
-            <a onClick={(e) => {
-              const ferts = formData.ferts;
-              setFormData({ ...formData, ferts: [...ferts, ["", ""]] });
-            }}>
-              Add+
-            </a>
-
-            <div className='flex items-center space-x-3'>
-              <Label className='text-left'>CO2?</Label>
-              <RadioGroup
-                onValueChange={(value) => setFormData({ ...formData, CO2: value === "Yes" })}
-                className="flex space-y-1"
-                defaultValue="No">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Yes" id="yes-co2" />
-                  <Label htmlFor="yes-co2">Yes</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="No" id="no-co2" />
-                  <Label htmlFor="no-co2">No</Label>
-                </div>
-              </RadioGroup>
-
-              {formData.CO2 && (
-                <Input
-                  name="CO2Description"
-                  placeholder="Describe CO2 supplementation"
-                  value={formData.CO2Description}
-                  onChange={handleChange}
-                />)
+                  return <div className="flex gap-2" key={`fert${index}`}>
+                    <Input
+                      placeholder="Fertilizer / Supplement"
+                      value={substance}
+                      onChange={handleFertChange(index, 0)}
+                    />
+                    <Input
+                      placeholder="How much / How often"
+                      value={regimen}
+                      onChange={handleFertChange(index, 1)}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => {
+                        formData.ferts.splice(index, 1);
+                        setFormData({ ...formData });
+                      }}>-</Button>
+                  </div>
+                })
               }
-            </div>
 
-          </CardContent>
-        </Card>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  const ferts = formData.ferts;
+                  console.log(ferts);
+                  setFormData({ ...formData, ferts: [...ferts, ["", ""]] });
+                }} >+</Button>
 
+              <Separator orientation="horizontal" />
+
+              <div className='flex items-center space-x-3'>
+                <Label className='text-left'>CO2?</Label>
+                <RadioGroup
+                  onValueChange={(value) => setFormData({ ...formData, CO2: value === "Yes" })}
+                  className="flex space-y-1"
+                  defaultValue="No">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Yes" id="yes-co2" />
+                    <Label htmlFor="yes-co2">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="No" id="no-co2" />
+                    <Label htmlFor="no-co2">No</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {
+                formData.CO2 && (
+                  <Input
+                    name="CO2Description"
+                    placeholder="Describe CO2 supplementation"
+                    value={formData.CO2Description}
+                    onChange={handleChange}
+                  />)
+              }
+
+            </CardContent>
+          </Card>
+        }
 
         <Button className="w-full" type="button" onClick={handlePrint}>
           Print Form
         </Button>
       </form>
 
-      <Card className="mt-6 p-4">
-        <CardContent>
-          <h3 className="text-lg font-semibold">Preview</h3>
-          <p><strong>Member Name:</strong> {formData.memberName}</p>
-          <p><strong>Species Latin Name:</strong> {formData.speciesLatinName}</p>
-          <p><strong>Species Common Name:</strong> {formData.speciesCommonName}</p>
-        </CardContent>
-      </Card>
-    </div>
+    </div >
   );
 }
