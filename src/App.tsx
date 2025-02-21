@@ -1,12 +1,10 @@
-import MemberForm from './MemberForm'
+import BapForm from './BapForm'
 
 function App() {
   return (
-    <>
-      <div>
-        <MemberForm></MemberForm>
-      </div>
-    </>
+    <div>
+      <BapForm></BapForm>
+    </div>
   )
 }
 

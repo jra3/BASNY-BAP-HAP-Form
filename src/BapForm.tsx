@@ -69,7 +69,7 @@ const SpawnLocations = [
   "Earth",
 ];
 
-export default function MemberForm() {
+export default function BapForm() {
   const [formData, setFormData] = useState({
     memberName: "", // restore from cookie?
     waterType: "",
