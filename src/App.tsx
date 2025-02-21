@@ -1,4 +1,3 @@
-import './App.css'
 import MemberForm from './MemberForm'
 
 function App() {
