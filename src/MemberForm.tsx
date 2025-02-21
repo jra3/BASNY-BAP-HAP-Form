@@ -224,13 +224,17 @@ export default function MemberForm() {
                       />
 
                       <MultiSelectCombobox
+                        name="foods"
                         placeholder='Foods (select all)'
+                        addsAllowed
                         options={FoodTypes}
                         onChange={(selected) => setFormData({ ...formData, foods: selected })}
                       />
 
                       <MultiSelectCombobox
+                        name="spawnLocations"
                         placeholder='Spawning Location (select all that apply)'
+                        addsAllowed
                         options={SpawnLocations}
                         onChange={(selected) => setFormData({ ...formData, spawnLocations: selected })}
                       />
@@ -273,6 +277,14 @@ export default function MemberForm() {
               <Input
                 name="filterType"
                 placeholder="Filter Type"
+                /* suggestions={[
+                  "Sponge",
+                  "Hang On Back",
+                  "Canister",
+                  "Internal",
+                  "Undergravel",
+                  "None",
+                ]} */
                 value={formData.filterType}
                 onChange={handleChange}
               />
@@ -362,26 +374,26 @@ export default function MemberForm() {
                   };
                 }
 
-                return <>
-                  <div className="flex">
-                    <Input
-                      placeholder="Fertilizer / Supplement"
-                      value={substance}
-                      onChange={handleFertChange(index, 0)}
-                    />
-                    <Input
-                      placeholder="How much / How often"
-                      value={regimen}
-                      onChange={handleFertChange(index, 1)}
-                    />
-                    <a onClick={(e) => {
+                return <div className="flex" key={`fert${index}`}>
+                  <Input
+                    placeholder="Fertilizer / Supplement"
+                    value={substance}
+                    onChange={handleFertChange(index, 0)}
+                  />
+                  <Input
+                    placeholder="How much / How often"
+                    value={regimen}
+                    onChange={handleFertChange(index, 1)}
+                  />
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
                       formData.ferts.splice(index, 1);
                       setFormData({ ...formData });
                     }}>
-                      -
-                    </a>
-                  </div>
-                </>
+                    Remove
+                  </Button>
+                </div>
               })
             }
 

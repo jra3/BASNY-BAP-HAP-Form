@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover"
 
 interface MultiSelectComboboxProps {
+  name: string;
   options: string[];
   selectedValues?: string[];
   onChange?: (selected: string[]) => void;
@@ -49,7 +50,7 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-full justify-between"
         >
           {selected.map(
             value => {
@@ -60,10 +61,10 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command children={[
-
+      <PopoverContent className="w-[400px] p-0">
+        <Command>
           <CommandInput
+            className="w-full"
             placeholder={`Search${attrs?.addsAllowed ? " / Add" : ""} options...`}
             value={needle}
             onValueChange={setNeedle}
@@ -71,31 +72,34 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
 
           <CommandList>
             <CommandEmpty>
-              <Button
-                variant="ghost"
-                className="w-full"
-                onClick={() => toggleSelection(needle)}>
-                Add custom option, "{needle}"
-              </Button>
+              {
+                attrs.addsAllowed ?
+                  <Button variant="ghost" className="w-full" onClick={() => toggleSelection(needle)}>
+                    Add custom option, "{needle}"
+                  </Button> :
+                  < Button variant="ghost" className="w-full">No matching results</Button>
+              }
             </CommandEmpty>
-            {options.map((option) => (
-              <CommandItem
-                value={option}
-                onSelect={toggleSelection}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    selected.includes(option) ? "opacity-100" : "opacity-0",
-                  )}
-                />
-                {option}
-              </CommandItem>
-            ))}
-          </CommandList>,
-
-        ]} />
+            {
+              options.map((option, index) => (
+                <CommandItem
+                  key={`${attrs.name}${index}`}
+                  value={option}
+                  onSelect={toggleSelection}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selected.includes(option) ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                  {option}
+                </CommandItem>
+              ))
+            }
+          </CommandList>
+        </Command>
       </PopoverContent>
-    </Popover>
+    </Popover >
   );
 }
