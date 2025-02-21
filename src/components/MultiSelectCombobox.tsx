@@ -16,43 +16,30 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-]
+interface MultiSelectComboboxProps {
+  options: string[];
+  selectedValues?: string[];
+  onChange?: (selected: string[]) => void;
+  addsAllowed?: boolean;
+  placeholder?: string;
+}
 
-export default function TypeaheadSelect() {
+export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
   const [open, setOpen] = useState(false)
-  const [options, setOptions] = useState(frameworks);
+  const [options, setOptions] = useState(attrs.options);
   const [needle, setNeedle] = useState<string>("");
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(attrs.selectedValues ?? []);
 
   const toggleSelection = (value: string) => {
-    if (!options.find(option => option.value == value)) {
-      setOptions([...options, { value, label: value }]); // Add new value to options
+    if (attrs.addsAllowed && !options.find(option => option == value)) {
+      setOptions([...options, value]); // Add new value to options
     }
-
+    setNeedle(""); // Clear search
     setSelected((prev) =>
       prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
     );
+
+    attrs.onChange?.(selected);
   };
 
   return (
@@ -64,7 +51,11 @@ export default function TypeaheadSelect() {
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          BOOP
+          {selected.map(
+            value => {
+              const selected = options.find(option => option === value);
+              return selected || value;
+            }).sort().join(", ") || attrs.placeholder || "Select options"}
 
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -73,7 +64,7 @@ export default function TypeaheadSelect() {
         <Command children={[
 
           <CommandInput
-            placeholder="Search options..."
+            placeholder={`Search${attrs?.addsAllowed ? " / Add" : ""} options...`}
             value={needle}
             onValueChange={setNeedle}
           />,
@@ -89,17 +80,16 @@ export default function TypeaheadSelect() {
             </CommandEmpty>
             {options.map((option) => (
               <CommandItem
-                key={option.value}
-                value={option.value}
-                onSelect={() => toggleSelection(option.value)}
+                value={option}
+                onSelect={toggleSelection}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    selected.includes(option.value) ? "opacity-100" : "opacity-0",
+                    selected.includes(option) ? "opacity-100" : "opacity-0",
                   )}
                 />
-                {option.label}
+                {option}
               </CommandItem>
             ))}
           </CommandList>,

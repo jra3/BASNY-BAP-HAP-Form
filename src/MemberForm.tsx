@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import MultiSelectCombobox from './components/MultiSelectCombobox';
 
 const SpeciesTypesAndClasses: Record<string, string[]> = {
   "Fish": [
@@ -77,8 +78,8 @@ export default function MemberForm() {
     speciesCommonName: "",
     date: "",
     count: "",
-    foods: [],
-    spawnLocations: [],
+    foods: [] as string[],
+    spawnLocations: [] as string[],
 
     tankSize: "",
     filterType: "",
@@ -94,7 +95,7 @@ export default function MemberForm() {
 
     CO2: false,
     CO2Description: "",
-    ferts: [["", ""]]
+    ferts: [["", ""]],
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,19 +223,18 @@ export default function MemberForm() {
                         onChange={handleChange}
                       />
 
-                      <Input
-                        name="foods"
-                        placeholder="TODO multiselect Foods Fed"
-                        value={formData.foods}
-                        onChange={handleChange}
+                      <MultiSelectCombobox
+                        placeholder='Foods (select all)'
+                        options={FoodTypes}
+                        onChange={(selected) => setFormData({ ...formData, foods: selected })}
                       />
 
-                      <Input
-                        name="spawnLocations"
-                        placeholder="TODO multiselect Species Bred On/In"
-                        value={formData.spawnLocations}
-                        onChange={handleChange}
+                      <MultiSelectCombobox
+                        placeholder='Spawning Location (select all that apply)'
+                        options={SpawnLocations}
+                        onChange={(selected) => setFormData({ ...formData, spawnLocations: selected })}
                       />
+
                     </>
                   case "Plant":
                   case "Coral":
@@ -375,8 +375,7 @@ export default function MemberForm() {
                       onChange={handleFertChange(index, 1)}
                     />
                     <a onClick={(e) => {
-                      const poop = formData.ferts.splice(index, 1);
-                      console.log(poop, formData.ferts);
+                      formData.ferts.splice(index, 1);
                       setFormData({ ...formData });
                     }}>
                       -

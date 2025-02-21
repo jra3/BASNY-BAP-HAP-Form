@@ -1,12 +1,10 @@
 import './App.css'
-import TypeaheadSelect from './components/Typeahead'
-import MemberForm from './Header'
+import MemberForm from './MemberForm'
 
 function App() {
   return (
     <>
       <div>
-        <TypeaheadSelect></TypeaheadSelect>
         <MemberForm></MemberForm>
       </div>
     </>
