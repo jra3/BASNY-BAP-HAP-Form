@@ -69,6 +69,10 @@ const SpawnLocations = [
   "Earth",
 ];
 
+type StringKeys<T> = {
+  [K in keyof T]: T[K] extends string ? K : never;
+}[keyof T];
+
 export default function BapForm() {
   const [formData, setFormData] = useState({
     memberName: "", // restore from cookie?
@@ -77,7 +81,7 @@ export default function BapForm() {
     classification: "",
     speciesLatinName: "",
     speciesCommonName: "",
-    date: "",
+    date: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
     count: "",
     foods: [] as string[],
     spawnLocations: [] as string[],
@@ -107,19 +111,66 @@ export default function BapForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFertChange = (x: number, y: number) => {
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      const ferts = formData.ferts;
+      ferts[x][y] = e.target.value;
+      setFormData({ ...formData, ferts });
+    };
+  }
+
+  const TextInput = (attrs: {
+    name: StringKeys<typeof formData>,
+    placeholder: string
+  }) => (
+    <Input
+      name={attrs.name}
+      placeholder={attrs.placeholder}
+      value={formData[attrs.name]}
+      onChange={handleChange}
+    />
+  );
+
   const handlePrint = () => {
-    const printContent = `
+    let printContent = `
+
       <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2 style="text-align: center;">Member Information</h2>
+    
         <p><strong>Member Name:</strong> ${formData.memberName}</p>
+        
+        <hr/>
+
+        <p><strong>Water Type:</strong> ${formData.waterType}</p>
+        <p><strong>Species Type:</strong> ${formData.speciesType}</p>
+        <p><strong>Species Class:</strong> ${formData.speciesCommonName}</p>
         <p><strong>Species Latin Name:</strong> ${formData.speciesLatinName}</p>
         <p><strong>Species Common Name:</strong> ${formData.speciesCommonName}</p>
-      </div>
+        <p><strong>Date Spawned / Propagated:</strong> ${formData.date}</p>
     `;
+
+    if (formData.speciesType === "Fish" || formData.speciesType === "Invert") {
+      printContent += `
+        <p><strong>Number Of Fry:</strong> ${formData.count}</p>
+        <p><strong>Foods:</strong> ${formData.foods.join(", ")}</p>
+        <p><strong>Spawn Locations:</strong> ${formData.spawnLocations.join(", ")}</p>
+      `;
+
+    } else {
+      printContent += `
+        <p><strong>Propagation Method:</strong> ${formData.propagationMethod}</p>
+      `;
+    }
+
+    printContent += `
+        </div>
+        <hr/>
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+    `;
+
     const newWindow = window.open("", "_blank");
     newWindow?.document.write(printContent);
-    newWindow?.document.close();
-    newWindow?.print();
+    //newWindow?.document.close();
+    //newWindow?.print();
   };
 
   return (
@@ -133,13 +184,14 @@ export default function BapForm() {
           value={formData.memberName}
           onChange={handleChange}
         />
-        <Card>
+
+        <Card id="species-details">
           <CardHeader>
             <CardTitle>Species Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
 
-            <div className='flex'>
+            <div className='flex gap-2'>
               <Select onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} value={formData.speciesType}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Species Type" />
@@ -208,13 +260,7 @@ export default function BapForm() {
                 })()
               }
               </Label>
-
-              <Input
-                name="date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange}
-              />
+              <Input name="date" type="date" value={formData.date} onChange={handleChange} />
             </div>
 
             {
@@ -265,14 +311,13 @@ export default function BapForm() {
           </CardContent>
         </Card>
 
-        <Card>
-
+        <Card id="tank-details">
           <CardHeader>
             <CardTitle>Tank Details</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2">
 
               <Input
                 name="tankSize"
@@ -381,7 +426,7 @@ export default function BapForm() {
 
         {
           ["Plant", "Coral"].includes(formData.speciesType) &&
-          <Card>
+          <Card id='plant-coral-supplemental'>
             <CardHeader>
               <CardTitle>Fertilizers & Supplements</CardTitle>
             </CardHeader>
