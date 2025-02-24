@@ -90,22 +90,21 @@ type StringKeys<T> = {
 
 const formSchema = z.object({
   memberName: z.string().min(1, { message: "Required." }),
-  //waterType: z.enum(["Fresh", "Brackish", "Salt"]),
-  //speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"]),
-  //classification: z.string().min(1),
+  waterType: z.enum(["Fresh", "Brackish", "Salt"]),
+  speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"]),
+  date: z.date(),
+  classification: z.string().min(1),
   speciesLatinName: z.string().min(1, { message: "Required" }),
   speciesCommonName: z.string().min(1, { message: "Required" }),
 });
 
 export default function BapForm() {
   const [formData, setFormData] = useState({
-    memberName: "", // restore from cookie?
-    waterType: "",
-    speciesType: "Fish",
-    classification: "",
-    speciesLatinName: "",
-    speciesCommonName: "",
-    date: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
+    //speciesType: "Fish",
+    //classification: "",
+    //speciesLatinName: "",
+    //speciesCommonName: "",
+    //date: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
     count: "",
     foods: [] as string[],
     spawnLocations: [] as string[],
@@ -153,23 +152,25 @@ export default function BapForm() {
   }
 
   const handlePrint = () => {
+    const vals = form.getValues();
+
     let printContent = `
 
       <div style="font-family: Arial, sans-serif; padding: 20px;">
     
-        <p><strong>Member Name:</strong> ${formData.memberName}</p>
+        <p><strong>Member Name:</strong> ${vals.memberName}</p>
         
         <hr/>
 
-        <p><strong>Water Type:</strong> ${formData.waterType}</p>
-        <p><strong>Species Type:</strong> ${formData.speciesType}</p>
-        <p><strong>Species Class:</strong> ${formData.speciesCommonName}</p>
-        <p><strong>Species Latin Name:</strong> ${formData.speciesLatinName}</p>
-        <p><strong>Species Common Name:</strong> ${formData.speciesCommonName}</p>
-        <p><strong>Date Spawned / Propagated:</strong> ${formData.date}</p>
+        <p><strong>Water Type:</strong> ${vals.waterType}</p>
+        <p><strong>Species Type:</strong> ${vals.speciesType}</p>
+        <p><strong>Species Class:</strong> ${vals.classification}</p>
+        <p><strong>Species Latin Name:</strong> ${vals.speciesLatinName}</p>
+        <p><strong>Species Common Name:</strong> ${vals.speciesCommonName}</p>
+        <p><strong>Date Spawned / Propagated:</strong> ${vals.date}</p>
     `;
 
-    if (formData.speciesType === "Fish" || formData.speciesType === "Invert") {
+    if (vals.speciesType === "Fish" || vals.speciesType === "Invert") {
       printContent += `
         <p><strong>Number Of Fry:</strong> ${formData.count}</p>
         <p><strong>Foods:</strong> ${formData.foods.join(", ")}</p>
@@ -203,15 +204,17 @@ export default function BapForm() {
     }
   })
 
+  const wrapInput = (input: JSX.Element) => (
+    <FormItem>
+      <FormControl>
+        {input}
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )
+
   const renderTextField = (placeholder: string) =>
-    ({ field }: { field: ControllerRenderProps<any, any> }) => (
-      <FormItem>
-        <FormControl>
-          <Input placeholder={placeholder} {...field} />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    );
+    ({ field }: { field: ControllerRenderProps<any, any> }) => wrapInput(<Input placeholder={placeholder} {...field} />);
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-2xl">
@@ -228,20 +231,28 @@ export default function BapForm() {
             <CardContent className="space-y-4">
 
               <div className='flex gap-2'>
-                <Select onValueChange={value => setFormData({ ...formData, speciesType: value, classification: "" })} value={formData.speciesType}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Species Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
-                      <SelectItem key={speciesType} value={speciesType}>
-                        {speciesType}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FormField control={form.control} name="speciesType" render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Select {...field}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Species Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
+                            <SelectItem key={speciesType} value={speciesType}>
+                              {speciesType}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormControl>
+                  </FormItem>
+                )} />
 
-                <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
+                {/*
+                 <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Water Type" />
                   </SelectTrigger>
@@ -253,9 +264,11 @@ export default function BapForm() {
                     ))}
                   </SelectContent>
                 </Select>
+ */}
+
               </div>
 
-              <Select onValueChange={value => setFormData({ ...formData, classification: value })} value={formData.classification}>
+              {/*               <Select onValueChange={value => setFormData({ ...formData, classification: value })} value={formData.classification}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Class" />
                 </SelectTrigger>
@@ -267,11 +280,11 @@ export default function BapForm() {
                   ))}
                 </SelectContent>
               </Select>
-
+ */}
               <FormField control={form.control} name="speciesCommonName" render={renderTextField("Species Common Name")} />
               <FormField control={form.control} name="speciesLatinName" render={renderTextField("Species Latin Name")} />
 
-              <div className="flex items-center space-x-3">
+              {/*               <div className="flex items-center space-x-3">
                 <Label className="w-60 text-right font-bold">{
                   (function () {
                     switch (formData.speciesType) {
@@ -287,10 +300,10 @@ export default function BapForm() {
                 </Label>
                 <Input name="date" type="date" value={formData.date} onChange={handleChange} />
               </div>
-
+ */}
               {
                 (function () {
-                  switch (formData.speciesType) {
+                  switch (form.getValues().speciesType) {
                     case "Fish":
                     case "Invert":
                       return <>
@@ -352,7 +365,7 @@ export default function BapForm() {
                 <FormField control={form.control} name="substrateColor" render={renderTextField("Substrate Color")} />
 
                 {
-                  ["Plant", "Coral"].includes(formData.speciesType) &&
+                  ["Plant", "Coral"].includes(form.getValues().speciesType) &&
                   <>
                     <FormField control={form.control} name="lightType" render={renderTextField("Type Of Light")} />
                     <FormField control={form.control} name="lightStrength" render={renderTextField("Wattage / PAR")} />
@@ -365,7 +378,7 @@ export default function BapForm() {
           </Card>
 
           {
-            ["Plant", "Coral"].includes(formData.speciesType) &&
+            ["Plant", "Coral"].includes(form.getValues().speciesType) &&
             <Card id='plant-coral-supplemental'>
               <CardHeader>
                 <CardTitle>Fertilizers & Supplements</CardTitle>
