@@ -1,28 +1,18 @@
 
-import React, { JSX, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import MultiSelectCombobox from './components/MultiSelectCombobox';
 import { Separator } from './components/ui/separator';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { ControllerProps, ControllerRenderProps, FieldPath, FieldValues, useForm } from 'react-hook-form';
+import { ControllerRenderProps, useForm } from 'react-hook-form';
 import FertilizerInput from './FertilizerInput';
+import { Textarea } from './components/ui/textarea';
 
 const SpeciesTypesAndClasses: Record<string, string[]> = {
   "Fish": [
@@ -84,137 +74,145 @@ const SpawnLocations = [
   "Earth",
 ];
 
-type StringKeys<T> = {
-  [K in keyof T]: T[K] extends string ? K : never;
-}[keyof T];
-
 const formSchema = z.object({
   memberName: z.string().min(1, { message: "Required." }),
-  waterType: z.enum(["Fresh", "Brackish", "Salt"]),
-  speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"]),
-  date: z.date(),
-  classification: z.string().min(1),
+  waterType: z.enum(["Fresh", "Brackish", "Salt"], { required_error: "Required." }),
+  speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"], { required_error: "Required." }),
+  date: z.date({ required_error: "Required." }),
+  classification: z.string().min(1, { message: "Required" }),
   speciesLatinName: z.string().min(1, { message: "Required" }),
   speciesCommonName: z.string().min(1, { message: "Required" }),
+  count: z.string().optional(),
+  foods: z.array(z.string()).optional(),
+  spawnLocations: z.array(z.string()).optional(),
+  propagationMethod: z.string().optional(),
+
+  tankSize: z.string().min(1, { message: "Required" }),
+  filterType: z.string().min(1, { message: "Required" }),
+  changeVolume: z.string().min(1, { message: "Required" }),
+  changeFrequency: z.string().min(1, { message: "Required" }),
+  temperature: z.string().min(1, { message: "Required" }),
+  pH: z.string().min(1, { message: "Required" }),
+  GH: z.string().min(1, { message: "Required" }),
+  specificGravity: z.string().optional(),
+  substrateType: z.string().min(1, { message: "Required" }),
+  substrateDepth: z.string().min(1, { message: "Required" }),
+  substrateColor: z.string().min(1, { message: "Required" }),
+
+  lightType: z.string().optional(),
+  lightStrength: z.string().optional(),
+  lightHours: z.string().optional(),
+
+  ferts: z.array(
+    z.object({
+      substance: z.string(),
+      regimen: z.string(),
+    })
+  ).optional(),
+
+  CO2: z.enum(["no", "yes"]).optional(),
+  CO2Description: z.string().optional(),
 });
 
+function onSubmit(values: z.infer<typeof formSchema>) {
+  try {
+    console.log("Form submitted successfully");
+    console.log(values);
+  } catch (error) {
+    console.error("Form submission error", error);
+  }
+}
+
+function handlePrint(values: z.infer<typeof formSchema>) {
+  try {
+    console.log(values.ferts);
+  } catch (error) {
+    console.error("Form submission error", error);
+  }
+}
+
+const renderTextField = (label: string, placeholder: string) =>
+  ({ field }: { field: ControllerRenderProps<any, any> }) => (
+    <FormItem>
+      <FormLabel>{label}</FormLabel>
+      <FormControl>
+        <Input placeholder={placeholder} {...field} />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  );
+
+const renderSelectField = (label: string, options: string[], placeholder = "") => {
+  return ({ field }: { field: ControllerRenderProps<any, any> }) => (
+    <FormItem className='w-full'>
+      <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <FormLabel>{label}</FormLabel>
+        <FormControl>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+        </FormControl>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <FormMessage />
+    </FormItem>
+  );
+};
+
 export default function BapForm() {
-  const [formData, setFormData] = useState({
-    //speciesType: "Fish",
-    //classification: "",
-    //speciesLatinName: "",
-    //speciesCommonName: "",
-    //date: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD
-    count: "",
-    foods: [] as string[],
-    spawnLocations: [] as string[],
-    propagationMethod: "",
-
-    tankSize: "",
-    filterType: "",
-    changeVolume: "",
-    changeFrequency: "",
-    temperature: "",
-    pH: "",
-    GH: "",
-    specificGravity: "",
-    substrateType: "",
-    substrateDepth: "",
-    substrateColor: "",
-
-    CO2: false,
-    CO2Description: "",
-    ferts: [["", ""]],
-    lightType: "",
-    lightStrength: "",
-    lightHours: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleFertChange = (x: number, y: number) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const ferts = formData.ferts;
-      ferts[x][y] = e.target.value;
-      setFormData({ ...formData, ferts });
-    };
-  }
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log("Form submitted successfully");
-      console.log(values);
-    } catch (error) {
-      console.error("Form submission error", error);
-    }
-  }
-
-  const handlePrint = () => {
-    const vals = form.getValues();
-
-    let printContent = `
-
-      <div style="font-family: Arial, sans-serif; padding: 20px;">
-    
-        <p><strong>Member Name:</strong> ${vals.memberName}</p>
-        
-        <hr/>
-
-        <p><strong>Water Type:</strong> ${vals.waterType}</p>
-        <p><strong>Species Type:</strong> ${vals.speciesType}</p>
-        <p><strong>Species Class:</strong> ${vals.classification}</p>
-        <p><strong>Species Latin Name:</strong> ${vals.speciesLatinName}</p>
-        <p><strong>Species Common Name:</strong> ${vals.speciesCommonName}</p>
-        <p><strong>Date Spawned / Propagated:</strong> ${vals.date}</p>
-    `;
-
-    if (vals.speciesType === "Fish" || vals.speciesType === "Invert") {
-      printContent += `
-        <p><strong>Number Of Fry:</strong> ${formData.count}</p>
-        <p><strong>Foods:</strong> ${formData.foods.join(", ")}</p>
-        <p><strong>Spawn Locations:</strong> ${formData.spawnLocations.join(", ")}</p>
-      `;
-
-    } else {
-      printContent += `
-        <p><strong>Propagation Method:</strong> ${formData.propagationMethod}</p>
-      `;
-    }
-
-    printContent += `
-        </div>
-        <hr/>
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-    `;
-
-    const newWindow = window.open("", "_blank");
-    newWindow?.document.write(printContent);
-    //newWindow?.document.close();
-    //newWindow?.print();
-  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       memberName: "",
+
+      speciesType: "Fish",
+      waterType: undefined,
+      date: new Date(),
       speciesLatinName: "",
       speciesCommonName: "",
+      classification: "",
+      count: "",
+      spawnLocations: [],
+      foods: [],
+
+      tankSize: "",
+      filterType: "",
+      changeVolume: "",
+      changeFrequency: "",
+
+      GH: "",
+      pH: "",
+      specificGravity: "",
+      substrateType: "",
+      substrateDepth: "",
+      substrateColor: "",
+      temperature: "",
+      lightHours: "",
+      lightStrength: "",
+      lightType: "",
+
+      CO2: "no",
+      CO2Description: "",
     }
   })
 
-  const wrapInput = (input: JSX.Element) => (
-    <FormItem>
-      <FormControl>
-        {input}
-      </FormControl>
-      <FormMessage />
-    </FormItem>
-  )
+  const CO2 = form.watch("CO2");
 
-  const renderTextField = (placeholder: string) =>
-    ({ field }: { field: ControllerRenderProps<any, any> }) => wrapInput(<Input placeholder={placeholder} {...field} />);
+  // Reset class options when species type changes
+  const [classOptions, setClassOptions] = useState(SpeciesTypesAndClasses[form.getValues().speciesType] ?? []);
+  const speciesType = form.watch("speciesType");
+  useEffect(() => {
+    // XXX resetting to "" does not seem to restore the placeholder string
+    form.resetField("classification");
+    setClassOptions(SpeciesTypesAndClasses[speciesType] ?? []);
+  }, [speciesType]);
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-2xl">
@@ -223,7 +221,7 @@ export default function BapForm() {
       <Form {...form} >
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" >
 
-          <FormField control={form.control} name="memberName" render={renderTextField("Member Name")} />
+          <FormField control={form.control} name="memberName" render={renderTextField("Member Name", "Jacques Cousteau...")} />
           <Card id="species-details">
             <CardHeader>
               <CardTitle>Species Details</CardTitle>
@@ -231,104 +229,67 @@ export default function BapForm() {
             <CardContent className="space-y-4">
 
               <div className='flex gap-2'>
-                <FormField control={form.control} name="speciesType" render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Select {...field}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Species Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.keys(SpeciesTypesAndClasses).map((speciesType) => (
-                            <SelectItem key={speciesType} value={speciesType}>
-                              {speciesType}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormControl>
-                  </FormItem>
-                )} />
 
-                {/*
-                 <Select onValueChange={value => setFormData({ ...formData, waterType: value })} value={formData.waterType}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Water Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {["Fresh", "Brackish", "Salt"].map((waterType) => (
-                      <SelectItem key={waterType} value={waterType}>
-                        {waterType}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
- */}
+                <FormField
+                  control={form.control}
+                  name="speciesType"
+                  render={renderSelectField("Species Type", Object.keys(SpeciesTypesAndClasses))} />
 
-              </div>
+                <FormField
+                  control={form.control}
+                  name="waterType"
+                  render={renderSelectField("Water Type", ["Fresh", "Brackish", "Salt"])} />
 
-              {/*               <Select onValueChange={value => setFormData({ ...formData, classification: value })} value={formData.classification}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Class" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(SpeciesTypesAndClasses[formData.speciesType] ?? []).map((classType) => (
-                    <SelectItem key={classType} value={classType}>
-                      {classType}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
- */}
-              <FormField control={form.control} name="speciesCommonName" render={renderTextField("Species Common Name")} />
-              <FormField control={form.control} name="speciesLatinName" render={renderTextField("Species Latin Name")} />
+              </div >
 
-              {/*               <div className="flex items-center space-x-3">
-                <Label className="w-60 text-right font-bold">{
-                  (function () {
-                    switch (formData.speciesType) {
-                      case "Fish":
-                      case "Invert":
-                        return "Date Spawned:";
-                      case "Plant":
-                      case "Coral":
-                        return "Date Propagated:";
-                    }
-                  })()
-                }
-                </Label>
-                <Input name="date" type="date" value={formData.date} onChange={handleChange} />
-              </div>
- */}
+              <FormField
+                control={form.control}
+                name="classification"
+                render={renderSelectField("Class", classOptions, `BAP/HAP class of ${speciesType}`)} />
+
+              <FormField control={form.control} name="speciesCommonName" render={renderTextField("Species Common Name", "Guppy")} />
+              <FormField control={form.control} name="speciesLatinName" render={renderTextField("Species Latin Name", "Poecilia Reticulata")} />
+
               {
                 (function () {
-                  switch (form.getValues().speciesType) {
+                  switch (speciesType) {
                     case "Fish":
                     case "Invert":
                       return <>
-                        <Input
+                        <FormField
+                          control={form.control}
                           name="count"
-                          placeholder="Number Of Fry"
-                          value={formData.count}
-                          onChange={handleChange}
-                        />
+                          render={renderTextField("# of Fry", "Zillions")} />
 
-                        <MultiSelectCombobox
-                          name="foods"
-                          placeholder='Foods (select all)'
-                          addsAllowed
-                          options={FoodTypes}
-                          onChange={(selected) => setFormData({ ...formData, foods: selected })}
-                        />
+                        <FormField control={form.control} name="foods" render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>Foods</FormLabel>
+                            <FormControl>
+                              <MultiSelectCombobox
+                                placeholder='Select all that apply'
+                                addsAllowed
+                                options={FoodTypes}
+                                onChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
 
-                        <MultiSelectCombobox
-                          name="spawnLocations"
-                          placeholder='Spawning Location (select all that apply)'
-                          addsAllowed
-                          options={SpawnLocations}
-                          onChange={(selected) => setFormData({ ...formData, spawnLocations: selected })}
-                        />
+                        <FormField control={form.control} name="spawnLocations" render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>Spawn Locations</FormLabel>
+                            <FormControl>
+                              <MultiSelectCombobox
+                                placeholder='Select all that apply'
+                                addsAllowed
+                                options={SpawnLocations}
+                                onChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
 
                       </>
                     case "Plant":
@@ -336,13 +297,13 @@ export default function BapForm() {
                       return <FormField
                         control={form.control}
                         name="propagationMethod"
-                        render={renderTextField("Method Of Propagation")} />
+                        render={renderTextField("Method of Propagation", "Seeds, Cuttings, Runners ...")} />
                   }
                 })()
               }
 
-            </CardContent>
-          </Card>
+            </CardContent >
+          </Card >
 
           <Card id="tank-details">
             <CardHeader>
@@ -352,24 +313,24 @@ export default function BapForm() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-2">
 
-                <FormField control={form.control} name="tankSize" render={renderTextField("Tank Size")} />
-                <FormField control={form.control} name="filterType" render={renderTextField("Filter Type")} />
-                <FormField control={form.control} name="changeVolume" render={renderTextField("Water Change Volume (%)")} />
-                <FormField control={form.control} name="changeFrequency" render={renderTextField("Water Change Frequency")} />
-                <FormField control={form.control} name="temperature" render={renderTextField("Temperature")} />
-                <FormField control={form.control} name="pH" render={renderTextField("pH")} />
-                <FormField control={form.control} name="GH" render={renderTextField("Hardness (GH)")} />
-                <FormField control={form.control} name="specificGravity" render={renderTextField("Specific Gravity")} />
-                <FormField control={form.control} name="substrateType" render={renderTextField("Substrate Type")} />
-                <FormField control={form.control} name="substrateDepth" render={renderTextField("Substrate Depth")} />
-                <FormField control={form.control} name="substrateColor" render={renderTextField("Substrate Color")} />
+                <FormField control={form.control} name="tankSize" render={renderTextField("Tank Size", "5g, 20 Long, 100g stock tank...")} />
+                <FormField control={form.control} name="filterType" render={renderTextField("Filter Type", "Sponge, HOB...")} />
+                <FormField control={form.control} name="changeVolume" render={renderTextField("Water Change Volume (%)", "10, 20, 50...")} />
+                <FormField control={form.control} name="changeFrequency" render={renderTextField("Water Change Frequency", "Daily, Weekly, Monthly...")} />
+                <FormField control={form.control} name="temperature" render={renderTextField("Temperature", "75F...")} />
+                <FormField control={form.control} name="pH" render={renderTextField("pH", "7.0...")} />
+                <FormField control={form.control} name="GH" render={renderTextField("Hardness (GH)", "200 ppm, 10 dH...")} />
+                <FormField control={form.control} name="specificGravity" render={renderTextField("Specific Gravity", "1.025...")} />
+                <FormField control={form.control} name="substrateType" render={renderTextField("Substrate Type", "Sand, Gravel, Barebottom...")} />
+                <FormField control={form.control} name="substrateDepth" render={renderTextField("Substrate Depth", "2\"...")} />
+                <FormField control={form.control} name="substrateColor" render={renderTextField("Substrate Color", "Brown, White, Hot Pink...")} />
 
                 {
-                  ["Plant", "Coral"].includes(form.getValues().speciesType) &&
+                  ["Plant", "Coral"].includes(speciesType) &&
                   <>
-                    <FormField control={form.control} name="lightType" render={renderTextField("Type Of Light")} />
-                    <FormField control={form.control} name="lightStrength" render={renderTextField("Wattage / PAR")} />
-                    <FormField control={form.control} name="lightHours" render={renderTextField("Light Hours")} />
+                    <FormField control={form.control} name="lightType" render={renderTextField("Type Of Light", "LED, Sunlight...")} />
+                    <FormField control={form.control} name="lightStrength" render={renderTextField("Wattage / PAR", "50W, 5PAR")} />
+                    <FormField control={form.control} name="lightHours" render={renderTextField("Light Hours", "14 Hours")} />
                   </>
                 }
 
@@ -378,40 +339,81 @@ export default function BapForm() {
           </Card>
 
           {
-            ["Plant", "Coral"].includes(form.getValues().speciesType) &&
+            ["Plant", "Coral"].includes(speciesType) &&
             <Card id='plant-coral-supplemental'>
               <CardHeader>
                 <CardTitle>Fertilizers & Supplements</CardTitle>
               </CardHeader>
 
               <CardContent className='space-y-2'>
-                <FertilizerInput />
+
+                <FormField
+                  control={form.control}
+                  name="ferts"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <FertilizerInput onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <Separator orientation="horizontal" />
 
-                <div className='flex items-center space-x-3'>
-                  <Label className='text-left'>CO2?</Label>
-                  <RadioGroup
-                    onValueChange={(value) => setFormData({ ...formData, CO2: value === "Yes" })}
-                    className="flex"
-                    defaultValue="No">
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="Yes" id="yes-co2" />
-                      <Label htmlFor="yes-co2">Yes</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="No" id="no-co2" />
-                      <Label htmlFor="no-co2">No</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="CO2"
+                  render={({ field }) => (
+                    <FormItem className="flex gap-x-4">
+                      <FormLabel>CO2</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => {
+                            console.log(value);
+                            field.onChange(value);
+                          }}
+                          className="flex flex-col"
+                        >
+                          {[
+                            ["No", "no"],
+                            ["Yes", "yes"],
+                          ].map((option, index) => (
+                            <FormItem className="flex items-center space-x-3 space-y-0" key={index}>
+                              <FormControl>
+                                <RadioGroupItem value={option[1]} />
+                              </FormControl>
+                              <FormLabel className="font-normal">
+                                {option[0]}
+                              </FormLabel>
+                            </FormItem>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
 
                 {
-                  formData.CO2 && (
+                  CO2 === "yes" && (
                     <FormField
                       control={form.control}
                       name="CO2Description"
-                      render={renderTextField("Describe CO2 supplementation")} />
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea
+                              placeholder="3 bubbles per second per 10 gallons of water. injected during the daylight period..."
+                              className="resize-none"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>Describe CO2 supplementation.</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )
                 }
 
@@ -425,12 +427,12 @@ export default function BapForm() {
             Validate Form
           </Button>
 
-          <Button className="w-full" type="button" onClick={handlePrint}>
+          <Button className="w-full" type="button" onClick={() => handlePrint(form.getValues())}>
             Print Form
           </Button>
 
-        </form>
-      </Form>
+        </form >
+      </Form >
     </div >
   );
 }

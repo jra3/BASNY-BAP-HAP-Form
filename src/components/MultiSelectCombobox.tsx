@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/popover"
 
 interface MultiSelectComboboxProps {
-  name: string;
   options: string[];
   selectedValues?: string[];
   onChange?: (selected: string[]) => void;
@@ -31,6 +30,10 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
   const [needle, setNeedle] = useState<string>("");
   const [selected, setSelected] = useState<string[]>(attrs.selectedValues ?? []);
 
+  useEffect(() => {
+    attrs.onChange?.(selected);
+  }, [selected])
+
   const toggleSelection = (value: string) => {
     if (attrs.addsAllowed && !options.find(option => option == value)) {
       setOptions([...options, value]); // Add new value to options
@@ -39,8 +42,6 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
     setSelected((prev) =>
       prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
     );
-
-    attrs.onChange?.(selected);
   };
 
   const weight = selected.length > 0 ? "font-medium" : "font-light";
@@ -63,7 +64,6 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
               const selected = options.find(option => option === value);
               return selected || value;
             }).sort().join(", ") || attrs.placeholder || "Select options"}
-
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -89,7 +89,7 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
             {
               options.map((option, index) => (
                 <CommandItem
-                  key={`${attrs.name}${index}`}
+                  key={index}
                   value={option}
                   onSelect={toggleSelection}
                 >
