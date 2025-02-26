@@ -74,30 +74,32 @@ const SpawnLocations = [
   "Earth",
 ];
 
+const isLivestock = (speciesType: string) => speciesType === "Fish" || speciesType === "Invert";
+
 const formSchema = z.object({
-  memberName: z.string().min(1, { message: "Required." }),
-  waterType: z.enum(["Fresh", "Brackish", "Salt"], { required_error: "Required." }),
-  speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"], { required_error: "Required." }),
-  date: z.date({ required_error: "Required." }),
-  classification: z.string().min(1, { message: "Required" }),
-  speciesLatinName: z.string().min(1, { message: "Required" }),
-  speciesCommonName: z.string().min(1, { message: "Required" }),
+  memberName: z.string().min(1),
+  waterType: z.enum(["Fresh", "Brackish", "Salt"]),
+  speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"]),
+  date: z.date(),
+  classification: z.string().min(1),
+  speciesLatinName: z.string().min(1),
+  speciesCommonName: z.string().min(1),
   count: z.string().optional(),
   foods: z.array(z.string()).optional(),
   spawnLocations: z.array(z.string()).optional(),
   propagationMethod: z.string().optional(),
 
-  tankSize: z.string().min(1, { message: "Required" }),
-  filterType: z.string().min(1, { message: "Required" }),
-  changeVolume: z.string().min(1, { message: "Required" }),
-  changeFrequency: z.string().min(1, { message: "Required" }),
-  temperature: z.string().min(1, { message: "Required" }),
-  pH: z.string().min(1, { message: "Required" }),
-  GH: z.string().min(1, { message: "Required" }),
+  tankSize: z.string().min(1),
+  filterType: z.string().min(1),
+  changeVolume: z.string().min(1),
+  changeFrequency: z.string().min(1),
+  temperature: z.string().min(1),
+  pH: z.string().min(1),
+  GH: z.string().min(1),
   specificGravity: z.string().optional(),
-  substrateType: z.string().min(1, { message: "Required" }),
-  substrateDepth: z.string().min(1, { message: "Required" }),
-  substrateColor: z.string().min(1, { message: "Required" }),
+  substrateType: z.string().min(1),
+  substrateDepth: z.string().min(1),
+  substrateColor: z.string().min(1),
 
   lightType: z.string().optional(),
   lightStrength: z.string().optional(),
@@ -112,7 +114,34 @@ const formSchema = z.object({
 
   CO2: z.enum(["no", "yes"]).optional(),
   CO2Description: z.string().optional(),
-});
+  //// Fields required only for fish / inverts VVV
+}).refine(
+  (data) => !isLivestock(data.speciesType) || Boolean(data.count),
+  { message: "Requied", path: ["count"], }
+).refine(
+  (data) => !isLivestock(data.speciesType) || (data.foods ?? []).length > 0,
+  { message: "Requied", path: ["foods"], }
+).refine(
+  (data) => !isLivestock(data.speciesType) || (data.spawnLocations ?? []).length > 0,
+  { message: "Requied", path: ["spawnLocations"], }
+  //// Fields required only for plants / corals VVV
+).refine(
+  (data) => isLivestock(data.speciesType) || Boolean(data.propagationMethod),
+  { message: "Requied", path: ["propagationMethod"], }
+).refine(
+  (data) => isLivestock(data.speciesType) || Boolean(data.lightType),
+  { message: "Requied", path: ["lightType"], }
+).refine(
+  (data) => isLivestock(data.speciesType) || Boolean(data.lightStrength),
+  { message: "Requied", path: ["lightStrength"], }
+).refine(
+  (data) => isLivestock(data.speciesType) || Boolean(data.lightHours),
+  { message: "Requied", path: ["lightHours"], }
+).refine(
+  (data) => isLivestock(data.speciesType) || data.CO2 !== "yes" || Boolean(data.CO2Description),
+  { message: "Requied", path: ["CO2Description"], }
+)
+
 
 function onSubmit(values: z.infer<typeof formSchema>) {
   try {
@@ -222,6 +251,7 @@ export default function BapForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4" >
 
           <FormField control={form.control} name="memberName" render={renderTextField("Member Name", "Jacques Cousteau...")} />
+
           <Card id="species-details">
             <CardHeader>
               <CardTitle>Species Details</CardTitle>
@@ -405,7 +435,6 @@ export default function BapForm() {
                           <FormControl>
                             <Textarea
                               placeholder="3 bubbles per second per 10 gallons of water. injected during the daylight period..."
-                              className="resize-none"
                               {...field}
                             />
                           </FormControl>
