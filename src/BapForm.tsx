@@ -9,141 +9,13 @@ import MultiSelectCombobox from './components/MultiSelectCombobox';
 import { Separator } from './components/ui/separator';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
 import { ControllerRenderProps, useForm } from 'react-hook-form';
 import FertilizerInput from './FertilizerInput';
 import { Textarea } from './components/ui/textarea';
-
-const SpeciesTypesAndClasses: Record<string, string[]> = {
-  "Fish": [
-    "Anabantoids",
-    "Brackish Water",
-    "Catfish & Loaches",
-    "Characins",
-    "Cichlids",
-    "Cyprinids",
-    "Killifish",
-    "Livebearers",
-    "Miscellaneous",
-    "Marine",
-    "Native",
-  ],
-  "Invert": [
-    "Snail",
-    "Shrimp",
-    "Other",
-  ],
-  "Plant": [
-    "Apongetons & Criniums",
-    "Anubias & Lagenandra",
-    "Cryptocoryne",
-    "Floating Plants",
-    "Primative Plants",
-    "Rosette Plants",
-    "Stem Plants",
-    "Sword Plants",
-    "Water Lilles",
-  ],
-  "Coral": [
-    "Hard",
-    "Soft",
-  ],
-}
-
-const FoodTypes = [
-  "Live",
-  "Frozen",
-  "Flake",
-  "Pellet",
-  "Freeze Dried",
-  "Vegetable",
-  "Gel",
-  "Insect",
-];
-
-const SpawnLocations = [
-  "Rock",
-  "Log",
-  "Cave",
-  "Plant",
-  "Glass",
-  "Peat",
-  "Pipe",
-  "Mop",
-  "Filter Tube",
-  "Earth",
-];
-
-const isLivestock = (speciesType: string) => speciesType === "Fish" || speciesType === "Invert";
-
-const formSchema = z.object({
-  memberName: z.string().min(1),
-  waterType: z.enum(["Fresh", "Brackish", "Salt"]),
-  speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"]),
-  date: z.date(),
-  classification: z.string().min(1),
-  speciesLatinName: z.string().min(1),
-  speciesCommonName: z.string().min(1),
-  count: z.string().optional(),
-  foods: z.array(z.string()).optional(),
-  spawnLocations: z.array(z.string()).optional(),
-  propagationMethod: z.string().optional(),
-
-  tankSize: z.string().min(1),
-  filterType: z.string().min(1),
-  changeVolume: z.string().min(1),
-  changeFrequency: z.string().min(1),
-  temperature: z.string().min(1),
-  pH: z.string().min(1),
-  GH: z.string().min(1),
-  specificGravity: z.string().optional(),
-  substrateType: z.string().min(1),
-  substrateDepth: z.string().min(1),
-  substrateColor: z.string().min(1),
-
-  lightType: z.string().optional(),
-  lightStrength: z.string().optional(),
-  lightHours: z.string().optional(),
-
-  ferts: z.array(
-    z.object({
-      substance: z.string(),
-      regimen: z.string(),
-    })
-  ).optional(),
-
-  CO2: z.enum(["no", "yes"]).optional(),
-  CO2Description: z.string().optional(),
-  //// Fields required only for fish / inverts VVV
-}).refine(
-  (data) => !isLivestock(data.speciesType) || Boolean(data.count),
-  { message: "Requied", path: ["count"], }
-).refine(
-  (data) => !isLivestock(data.speciesType) || (data.foods ?? []).length > 0,
-  { message: "Requied", path: ["foods"], }
-).refine(
-  (data) => !isLivestock(data.speciesType) || (data.spawnLocations ?? []).length > 0,
-  { message: "Requied", path: ["spawnLocations"], }
-  //// Fields required only for plants / corals VVV
-).refine(
-  (data) => isLivestock(data.speciesType) || Boolean(data.propagationMethod),
-  { message: "Requied", path: ["propagationMethod"], }
-).refine(
-  (data) => isLivestock(data.speciesType) || Boolean(data.lightType),
-  { message: "Requied", path: ["lightType"], }
-).refine(
-  (data) => isLivestock(data.speciesType) || Boolean(data.lightStrength),
-  { message: "Requied", path: ["lightStrength"], }
-).refine(
-  (data) => isLivestock(data.speciesType) || Boolean(data.lightHours),
-  { message: "Requied", path: ["lightHours"], }
-).refine(
-  (data) => isLivestock(data.speciesType) || data.CO2 !== "yes" || Boolean(data.CO2Description),
-  { message: "Requied", path: ["CO2Description"], }
-)
+import { bapSchema, foodTypes, FormValues, isLivestock, spawnLocations, speciesTypesAndClasses } from './Schema';
 
 
-function onSubmit(values: z.infer<typeof formSchema>) {
+function onSubmit(values: FormValues) {
   try {
     console.log("Form submitted successfully");
     console.log(values);
@@ -152,7 +24,7 @@ function onSubmit(values: z.infer<typeof formSchema>) {
   }
 }
 
-function handlePrint(values: z.infer<typeof formSchema>) {
+function handlePrint(values: FormValues) {
   try {
     console.log(values.ferts);
   } catch (error) {
@@ -196,8 +68,8 @@ const renderSelectField = (label: string, options: string[], placeholder = "") =
 
 export default function BapForm() {
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<FormValues>({
+    resolver: zodResolver(bapSchema),
     defaultValues: {
       memberName: "",
 
@@ -235,12 +107,12 @@ export default function BapForm() {
   const CO2 = form.watch("CO2");
 
   // Reset class options when species type changes
-  const [classOptions, setClassOptions] = useState(SpeciesTypesAndClasses[form.getValues().speciesType] ?? []);
+  const [classOptions, setClassOptions] = useState(speciesTypesAndClasses[form.getValues().speciesType] ?? []);
   const speciesType = form.watch("speciesType");
   useEffect(() => {
     // XXX resetting to "" does not seem to restore the placeholder string
     form.resetField("classification");
-    setClassOptions(SpeciesTypesAndClasses[speciesType] ?? []);
+    setClassOptions(speciesTypesAndClasses[speciesType] ?? []);
   }, [speciesType]);
 
   return (
@@ -263,7 +135,7 @@ export default function BapForm() {
                 <FormField
                   control={form.control}
                   name="speciesType"
-                  render={renderSelectField("Species Type", Object.keys(SpeciesTypesAndClasses))} />
+                  render={renderSelectField("Species Type", Object.keys(speciesTypesAndClasses))} />
 
                 <FormField
                   control={form.control}
@@ -282,55 +154,54 @@ export default function BapForm() {
 
               {
                 (function () {
-                  switch (speciesType) {
-                    case "Fish":
-                    case "Invert":
-                      return <>
-                        <FormField
-                          control={form.control}
-                          name="count"
-                          render={renderTextField("# of Fry", "Zillions")} />
-
-                        <FormField control={form.control} name="foods" render={({ field }) => (
-                          <FormItem className="w-full">
-                            <FormLabel>Foods</FormLabel>
-                            <FormControl>
-                              <MultiSelectCombobox
-                                placeholder='Select all that apply'
-                                addsAllowed
-                                options={FoodTypes}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-
-                        <FormField control={form.control} name="spawnLocations" render={({ field }) => (
-                          <FormItem className="w-full">
-                            <FormLabel>Spawn Locations</FormLabel>
-                            <FormControl>
-                              <MultiSelectCombobox
-                                placeholder='Select all that apply'
-                                addsAllowed
-                                options={SpawnLocations}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )} />
-
-                      </>
-                    case "Plant":
-                    case "Coral":
-                      return <FormField
+                  if (isLivestock(speciesType)) {
+                    return <>
+                      <FormField
                         control={form.control}
-                        name="propagationMethod"
-                        render={renderTextField("Method of Propagation", "Seeds, Cuttings, Runners ...")} />
+                        name="count"
+                        render={renderTextField("# of Fry", "Zillions")} />
+
+                      <FormField control={form.control} name="foods" render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>Foods</FormLabel>
+                          <FormControl>
+                            <MultiSelectCombobox
+                              placeholder='Select all that apply'
+                              addsAllowed
+                              options={foodTypes}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+
+                      <FormField control={form.control} name="spawnLocations" render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>Spawn Locations</FormLabel>
+                          <FormControl>
+                            <MultiSelectCombobox
+                              placeholder='Select all that apply'
+                              addsAllowed
+                              options={spawnLocations}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+
+                    </>
+
+                  } else {
+                    return <FormField
+                      control={form.control}
+                      name="propagationMethod"
+                      render={renderTextField("Method of Propagation", "Seeds, Cuttings, Runners ...")} />;
                   }
                 })()
               }
+
 
             </CardContent >
           </Card >
@@ -356,7 +227,7 @@ export default function BapForm() {
                 <FormField control={form.control} name="substrateColor" render={renderTextField("Substrate Color", "Brown, White, Hot Pink...")} />
 
                 {
-                  ["Plant", "Coral"].includes(speciesType) &&
+                  !isLivestock(speciesType) &&
                   <>
                     <FormField control={form.control} name="lightType" render={renderTextField("Type Of Light", "LED, Sunlight...")} />
                     <FormField control={form.control} name="lightStrength" render={renderTextField("Wattage / PAR", "50W, 5PAR")} />
@@ -369,7 +240,7 @@ export default function BapForm() {
           </Card>
 
           {
-            ["Plant", "Coral"].includes(speciesType) &&
+            !isLivestock(speciesType) &&
             <Card id='plant-coral-supplemental'>
               <CardHeader>
                 <CardTitle>Fertilizers & Supplements</CardTitle>
@@ -400,10 +271,7 @@ export default function BapForm() {
                       <FormLabel>CO2</FormLabel>
                       <FormControl>
                         <RadioGroup
-                          onValueChange={(value) => {
-                            console.log(value);
-                            field.onChange(value);
-                          }}
+                          onValueChange={field.onChange}
                           className="flex flex-col"
                         >
                           {[
@@ -412,7 +280,7 @@ export default function BapForm() {
                           ].map((option, index) => (
                             <FormItem className="flex items-center space-x-3 space-y-0" key={index}>
                               <FormControl>
-                                <RadioGroupItem value={option[1]} />
+                                <RadioGroupItem value={option[1]} checked={option[1] === form.getValues().CO2} />
                               </FormControl>
                               <FormLabel className="font-normal">
                                 {option[0]}
