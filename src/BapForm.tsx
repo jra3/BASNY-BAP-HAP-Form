@@ -139,6 +139,7 @@ export default function BapForm() {
                               placeholder='Select all that apply'
                               addsAllowed
                               options={foodTypes}
+                              selectedValues={field.value}
                               onChange={field.onChange}
                             />
                           </FormControl>
@@ -154,6 +155,7 @@ export default function BapForm() {
                               placeholder='Select all that apply'
                               addsAllowed
                               options={spawnLocations}
+                              selectedValues={field.value}
                               onChange={field.onChange}
                             />
                           </FormControl>
