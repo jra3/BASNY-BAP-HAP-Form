@@ -1,22 +1,26 @@
 import BapForm from './BapForm'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { FormProvider } from './FormContext';
+import PrintPage from './Render';
 
 function Fill() {
   return <BapForm />;
 }
 
 function Render() {
-  return <h1>Render Page</h1>;
+  return <PrintPage />;
 }
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Fill />} />
-        <Route path="/render" element={<Render />} />
-      </Routes>
-    </Router>
+    <FormProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Fill />} />
+          <Route path="/render" element={<Render />} />
+        </Routes>
+      </Router>
+    </FormProvider>
   );
 }
 

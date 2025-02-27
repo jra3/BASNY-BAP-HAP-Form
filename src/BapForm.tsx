@@ -13,16 +13,10 @@ import { ControllerRenderProps, useForm } from 'react-hook-form';
 import FertilizerInput from './FertilizerInput';
 import { Textarea } from './components/ui/textarea';
 import { bapSchema, foodTypes, FormValues, isLivestock, spawnLocations, speciesTypesAndClasses } from './Schema';
+import { useFormContext } from './FormContext';
+import { useNavigate } from 'react-router-dom';
 
 
-function onSubmit(values: FormValues) {
-  try {
-    console.log("Form submitted successfully");
-    console.log(values);
-  } catch (error) {
-    console.error("Form submission error", error);
-  }
-}
 
 function handlePrint(values: FormValues) {
   try {
@@ -67,42 +61,18 @@ const renderSelectField = (label: string, options: string[], placeholder = "") =
 };
 
 export default function BapForm() {
+  const { formData, setFormData } = useFormContext();
+  const navigate = useNavigate();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(bapSchema),
-    defaultValues: {
-      memberName: "",
+    defaultValues: formData,
+  });
 
-      speciesType: "Fish",
-      waterType: undefined,
-      date: new Date(),
-      speciesLatinName: "",
-      speciesCommonName: "",
-      classification: "",
-      count: "",
-      spawnLocations: [],
-      foods: [],
-
-      tankSize: "",
-      filterType: "",
-      changeVolume: "",
-      changeFrequency: "",
-
-      GH: "",
-      pH: "",
-      specificGravity: "",
-      substrateType: "",
-      substrateDepth: "",
-      substrateColor: "",
-      temperature: "",
-      lightHours: "",
-      lightStrength: "",
-      lightType: "",
-
-      CO2: "no",
-      CO2Description: "",
-    }
-  })
+  function onSubmit(data: FormValues) {
+    setFormData(data);
+    navigate('/render');
+  };
 
   const CO2 = form.watch("CO2");
 
@@ -321,11 +291,7 @@ export default function BapForm() {
           <FormMessage />
 
           <Button className="w-full" type="submit">
-            Validate Form
-          </Button>
-
-          <Button className="w-full" type="button" onClick={() => handlePrint(form.getValues())}>
-            Print Form
+            Next
           </Button>
 
         </form >
