@@ -16,16 +16,6 @@ import { bapSchema, foodTypes, FormValues, isLivestock, spawnLocations, speciesT
 import { useFormContext } from './FormContext';
 import { useNavigate } from 'react-router-dom';
 
-
-
-function handlePrint(values: FormValues) {
-  try {
-    console.log(values.ferts);
-  } catch (error) {
-    console.error("Form submission error", error);
-  }
-}
-
 const renderTextField = (label: string, placeholder: string) =>
   ({ field }: { field: ControllerRenderProps<any, any> }) => (
     <FormItem>
