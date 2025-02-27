@@ -157,54 +157,16 @@ const PrintPage = () => {
           <span className={valueText}>{formData.spawnLocations?.join(", ")}</span>
         </div>
 
-        {/* Row 2 */}
-        <div className="flex gap-6">
-          <div className="flex-1">
-            <span className={label}>Date of Birth</span>
-            <div className="border-b border-black h-6"></div>
+        <div className='flex mt-4'>
+          <div className={formCell}>
+            <span className={cn(label)}>WITNESSED BY</span>
           </div>
-          <div className="flex-[2]">
-            <span className={label}>Address</span>
-            <div className="border-b border-black h-6"></div>
+          <div className={formCell}>
+            <span className={cn(label)}>DATE</span>
           </div>
         </div>
 
-        {/* Row 3 */}
-        <div className="flex gap-6">
-          <div className="flex-1">
-            <span className={label}>Phone Number</span>
-            <div className="border-b border-black h-6"></div>
-          </div>
-          <div className="flex-1">
-            <span className={label}>Email</span>
-            <div className="border-b border-black h-6"></div>
-          </div>
-        </div>
-
-        {/* License Type */}
-        <div className="flex gap-6">
-          <div className="flex-1">
-            <span className={label}>License Type</span>
-            <div className="border-b border-black h-6"></div>
-          </div>
-          <div className="flex-[2]">
-            <span className={label}>Other Information</span>
-            <div className="border-b border-black h-6"></div>
-          </div>
-        </div>
-
-        {/* Signature Section */}
-        <div className="flex justify-between mt-8">
-          <div className="flex-1 text-center">
-            <div className="border-t border-black w-full h-6"></div>
-            <span className="block font-extralight mt-2">Applicant's Signature</span>
-          </div>
-          <div className="flex-1 text-center">
-            <div className="border-t border-black w-full h-6"></div>
-            <span className="block font-extralight mt-2">Date</span>
-          </div>
-        </div>
-      </div >
+      </div>
     </div >
   );
 
