@@ -166,6 +166,29 @@ const PrintPage = () => {
           </div>
         </div>
 
+        <div className="bg-indigo-200">
+          {
+            [
+              ["ARTICLE SUBMITTED", "# OF PAGES"],
+              ["FIRST TIME BAS SPAWN", "FLOWERED"],
+              ["RE-VISITED BY", "DATE"],
+              ["CERTIFICATE #", "POINTS"],
+              ["DATE PRESENTED", "BAP CHAIRPERSON"],
+            ].map((v) => <div className='flex'>
+              <div className={formCell}>
+                <span className={label}>{v[0]}</span>
+              </div>
+              <div className={formCell} />
+
+              <div className={formCell}>
+                <span className={label}>{v[1]}</span>
+              </div>
+              <div className={formCell} />
+            </div>
+            )
+          }
+        </div>
+
       </div>
     </div >
   );
