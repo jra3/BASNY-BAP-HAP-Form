@@ -91,6 +91,58 @@ const PrintPage = () => {
           <span className={valueText}>{formData.spawnLocations?.join(", ")}</span>
         </div>
 
+        <span className='font-extralight text-xs m-2'>
+          For Coral & Plants fill out the section below as well
+        </span>
+
+        <div className={formCell}>
+          <span className={cn(label, "min-w-44")}>PROPAGATION METHOD USED:</span>
+          <span className={valueText}>{formData.propagationMethod}</span>
+        </div>
+        <div className={formCell}>
+          <span className={cn(label, "min-w-44")}>TYPE OF LIGHTING USED:</span>
+          <span className={valueText}>{formData.lightType}</span>
+        </div>
+        <div className='flex'>
+          <div className={formCell}>
+            <span className={label}>TOTAL LIGHTING WATTAGE</span>
+          </div>
+          <div className={formCell}>
+            <span className={valueText}>{formData.lightStrength}</span>
+          </div>
+          <div className={formCell}>
+            <span className={label}># OF HOURS ILLUMINATED</span>
+          </div>
+          <div className={formCell}>
+            <span className={valueText}>{formData.lightHours}</span>
+          </div>
+        </div>
+
+        <div className="flex w-full mt-1 mb-1">
+          <div className="w-4" />
+          <span className={cn("text-center", "text-xs", "flex-1", "font-extralight")}>FERTILIZERS AND SUPPLIMENTS USED (IF ANY)</span>
+          <span className={cn("text-center", "text-xs", "flex-1", "font-extralight")}>HOW MUCH / HOW OFTEN</span>
+        </div>
+
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
+          <div className="flex w-full">
+            <div className="border border-black h-6 w-4 flex items-center justify-center">
+              <span className='text-center'>{index + 1}</span>
+            </div>
+            <div className={formCell}>
+              <span className={cn("ml-2", valueText)}>{formData.ferts?.[index]?.substance || ""}</span>
+            </div>
+            <div className={formCell}>
+              <span className={cn("ml-2", valueText)}>{formData.ferts?.[index]?.regimen || ""}</span>
+            </div>
+          </div>))
+        }
+        <div className={formCell}>
+          <span className={cn(label, "min-w-40")}> USING CARBON ENRICHMENT?: </span>
+          <span className={valueText}>{formData.CO2}</span>
+          <span className={cn(valueText, "ml-4")}>{formData.CO2Description}</span>
+        </div>
+
         <div className='flex mt-4'>
           <div className={formCell}>
             <span className={cn(label)}>WITNESSED BY</span>
@@ -124,7 +176,7 @@ const PrintPage = () => {
         </div>
 
       </div>
-    </div >
+    </div>
   );
 
 };

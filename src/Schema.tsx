@@ -100,7 +100,7 @@ export const bapSchema = z.object({
         })
     ).optional(),
 
-    CO2: z.enum(["no", "yes"]).optional(),
+    CO2: z.enum(["NO", "YES"]).optional(),
     CO2Description: z.string().optional(),
     //// Fields required only for fish / inverts VVV
 }).refine(
@@ -126,7 +126,7 @@ export const bapSchema = z.object({
     (data) => isLivestock(data.speciesType) || Boolean(data.lightHours),
     { message: "Requied", path: ["lightHours"], }
 ).refine(
-    (data) => isLivestock(data.speciesType) || data.CO2 !== "yes" || Boolean(data.CO2Description),
+    (data) => isLivestock(data.speciesType) || data.CO2 !== "YES" || Boolean(data.CO2Description),
     { message: "Requied", path: ["CO2Description"], }
 )
 

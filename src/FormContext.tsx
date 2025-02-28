@@ -37,7 +37,7 @@ const defaultValues: FormValues = {
   lightStrength: "",
   lightType: "",
 
-  CO2: "no",
+  CO2: "NO",
   CO2Description: "",
 };
 
