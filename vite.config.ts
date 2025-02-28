@@ -14,4 +14,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  base: "/BASNY-BAP-HAP-Form/", // Change to match your repository name
 })
