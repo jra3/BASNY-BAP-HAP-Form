@@ -57,95 +57,29 @@ const PrintPage = () => {
           <span className={valueText}>{formData.waterType}</span>
         </div >
 
-        <div className='flex'>
-          <div className={formCell}>
-            <span className={label}>TANK SIZE</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.tankSize}</span>
-          </div>
-          <div className={formCell}>
-            <span className={label}>SUBSTRATE COLOR</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.substrateColor}</span>
-          </div>
-        </div>
-
-        <div className='flex'>
-          <div className={formCell}>
-            <span className={label}>FILTER TYPE</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.filterType}</span>
-          </div>
-          <div className={formCell}>
-            <span className={label}>TEMPERATURE</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.temperature}</span>
-          </div>
-        </div>
-
-        <div className='flex'>
-          <div className={formCell}>
-            <span className={label}>WATER CHANGE VOLUME</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.changeVolume}</span>
-          </div>
-          <div className={formCell}>
-            <span className={label}>pH</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.pH}</span>
-          </div>
-        </div>
-
-        <div className='flex'>
-          <div className={formCell}>
-            <span className={label}>WATER CHANGE FREQUENCY</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.changeFrequency}</span>
-          </div>
-          <div className={formCell}>
-            <span className={label}>HARDNESS (GH)</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.GH}</span>
-          </div>
-        </div>
-
-        <div className='flex'>
-          <div className={formCell}>
-            <span className={label}>SUBSTRATE TYPE</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.substrateType}</span>
-          </div>
-          <div className={formCell}>
-            <span className={label}>SPECIFIC GRAVITY (SP.G.)</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.specificGravity}</span>
-          </div>
-        </div>
-
-        <div className='flex'>
-          <div className={formCell}>
-            <span className={label}>SUBSTRATE DEPTH</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.substrateDepth}</span>
-          </div>
-          <div className={formCell}>
-            <span className={label}>NUMBER OF FRY</span>
-          </div>
-          <div className={formCell}>
-            <span className={valueText}>{formData.count}</span>
-          </div>
-        </div>
+        {
+          [
+            ["TANK SIZE", formData.tankSize, "SUBSTRATE COLOR", formData.substrateColor],
+            ["FILTER TYPE", formData.filterType, "TEMPERATURE", formData.temperature],
+            ["WATER CHANGE VOLUME", formData.changeVolume, "pH", formData.pH],
+            ["WATER CHANGE FREQUENCY", formData.changeFrequency, "HARDNESS (GH)", formData.GH],
+            ["SUBSTRATE TYPE", formData.substrateType, "SPECIFIC GRAVITY (SP.G.)", formData.specificGravity],
+            ["SUBSTRATE DEPTH", formData.substrateDepth, "NUMBER OF FRY", formData.count],
+          ].map((v) => <div className='flex'>
+            <div className={formCell}>
+              <span className={label}>{v[0]}</span>
+            </div>
+            <div className={formCell}>
+              <span className={valueText}>{v[1]}</span>
+            </div>
+            <div className={formCell}>
+              <span className={label}>{v[2]}</span>
+            </div>
+            <div className={formCell}>
+              <span className={valueText}>{v[3]}</span>
+            </div>
+          </div>)
+        }
 
         <div className={formCell}>
           <span className={cn(label, "min-w-30")}>FOODS</span>
