@@ -256,7 +256,7 @@ export default function BapForm() {
                 />
 
                 {
-                  CO2 === "yes" && (
+                  CO2 === "YES" && (
                     <FormField
                       control={form.control}
                       name="CO2Description"
