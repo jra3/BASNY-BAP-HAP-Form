@@ -126,7 +126,7 @@ const PrintPage = () => {
         </div>
 
         {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
-          <div className="flex w-full">
+          <div className="flex w-full" key={index}>
             <div className="border border-black h-6 w-4 flex items-center justify-center">
               <span className='text-center'>{index + 1}</span>
             </div>
