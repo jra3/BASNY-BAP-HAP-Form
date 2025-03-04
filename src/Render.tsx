@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useFormContext } from './FormContext';
 import { useNavigate } from 'react-router-dom';
 import { cn } from './lib/utils';
+import { isLivestock } from './Schema';
 
 const formCell = cn("flex", "flex-1", "border", "border-black", "h-6");
 const label = cn("block", "font-extralight", "text-xs");
@@ -139,7 +140,7 @@ const PrintPage = () => {
         }
         <div className={formCell}>
           <span className={cn(label, "min-w-40")}> USING CARBON ENRICHMENT?: </span>
-          <span className={valueText}>{formData.CO2}</span>
+          <span className={valueText}>{!isLivestock(formData.speciesType) && formData.CO2}</span>
           <span className={cn(valueText, "ml-4")}>{formData.CO2Description}</span>
         </div>
 
