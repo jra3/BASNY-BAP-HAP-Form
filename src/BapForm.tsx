@@ -282,10 +282,16 @@ export default function BapForm() {
 
           <FormMessage />
 
-          <Button className="w-full" type="submit">
-            Next
-          </Button>
-
+          <div className='flex gap-4'>
+            <Button className="w-full" type="submit" disabled={!form.formState.isValid && form.formState.submitCount > 0}>
+              Next
+            </Button>
+            {!form.formState.isValid && form.formState.submitCount > 0 &&
+              <Button className="w-full bg-destructive" type="button" onClick={() => onSubmit(form.getValues())}>
+                Print with blanks
+              </Button>
+            }
+          </div>
         </form >
       </Form >
     </div >
