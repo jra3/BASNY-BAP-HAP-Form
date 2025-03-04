@@ -144,6 +144,7 @@ const PrintPage = () => {
           <span className={cn(valueText, "ml-4")}>{formData.CO2Description}</span>
         </div>
 
+
         <div className='flex mt-4'>
           <div className={formCell}>
             <span className={cn(label)}>WITNESSED BY</span>
