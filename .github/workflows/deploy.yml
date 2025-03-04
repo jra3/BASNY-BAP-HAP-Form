@@ -1,5 +1,4 @@
-name: Deploy Vite App
-
+name: Deploy App
 on:
     push:
         branches:
@@ -10,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Install and Build
               run: |
@@ -20,5 +19,5 @@ jobs:
             - name: Deploy to GitHub Pages
               uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  branch: gh-pages
+                  branch: build-app
                   folder: dist
