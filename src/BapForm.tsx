@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import MultiSelectCombobox from './components/MultiSelectCombobox';
@@ -15,6 +15,7 @@ import { Textarea } from './components/ui/textarea';
 import { bapSchema, foodTypes, FormValues, isLivestock, spawnLocations, speciesTypesAndClasses } from './Schema';
 import { useFormContext } from './FormContext';
 import { useNavigate } from 'react-router-dom';
+import { TankDetailsControls } from './TankDetails';
 
 const renderTextField = (label: string, placeholder: string) =>
   ({ field }: { field: ControllerRenderProps<any, any> }) => (
@@ -53,6 +54,7 @@ const renderSelectField = (label: string, options: string[], placeholder = "") =
 export default function BapForm() {
   const { formData, setFormData } = useFormContext();
   const navigate = useNavigate();
+
 
   const form = useForm<FormValues>({
     resolver: zodResolver(bapSchema),
@@ -157,7 +159,6 @@ export default function BapForm() {
                           <FormMessage />
                         </FormItem>
                       )} />
-
                     </>
 
                   } else {
@@ -168,8 +169,6 @@ export default function BapForm() {
                   }
                 })()
               }
-
-
             </CardContent >
           </Card >
 
@@ -204,6 +203,11 @@ export default function BapForm() {
 
               </div>
             </CardContent>
+            <CardFooter>
+              <div className='flex gap-2'>
+                <TankDetailsControls form={form} />
+              </div>
+            </CardFooter>
           </Card>
 
           {
