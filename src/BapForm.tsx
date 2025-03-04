@@ -66,6 +66,11 @@ export default function BapForm() {
 
   const CO2 = form.watch("CO2");
 
+  const memberName = form.watch("memberName");
+  useEffect(() => {
+    localStorage.setItem("memberName", memberName);
+  }, [memberName]);
+
   // Reset class options when species type changes
   const [classOptions, setClassOptions] = useState(speciesTypesAndClasses[form.getValues().speciesType] ?? []);
   const speciesType = form.watch("speciesType");

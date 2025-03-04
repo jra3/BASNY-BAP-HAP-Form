@@ -9,7 +9,7 @@ interface FormContextType {
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
 const defaultValues: FormValues = {
-  memberName: "",
+  memberName: localStorage.getItem("memberName") ?? "",
 
   speciesType: "Fish",
   waterType: "Fresh",
