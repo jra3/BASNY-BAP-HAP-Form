@@ -162,7 +162,7 @@ const PrintPage = () => {
               ["RE-VISITED BY", "DATE"],
               ["CERTIFICATE #", "POINTS"],
               ["DATE PRESENTED", "BAP CHAIRPERSON"],
-            ].map((v) => <div className='flex'>
+            ].map((v, index) => <div className='flex' key={index}>
               <div className={formCell}>
                 <span className={label}>{v[0]}</span>
               </div>

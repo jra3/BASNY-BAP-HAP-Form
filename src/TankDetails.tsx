@@ -85,9 +85,9 @@ export function TankDetailsControls({ form }: TankDetailsControlsProps) {
     setTanks(newTanks);
   }
 
-  const clearButton = <Button variant="destructive" type="button" onClick={() => resetTankDetails(form)}>Clear</Button>
+  const clearButton = <Button key="clear" variant="destructive" type="button" onClick={() => resetTankDetails(form)}>Clear</Button>
 
-  const saveButton = <Sheet>
+  const saveButton = <Sheet key={"save"}>
     <SheetTrigger asChild>
       <Button variant="outline">Save</Button>
     </SheetTrigger>
@@ -119,7 +119,7 @@ export function TankDetailsControls({ form }: TankDetailsControlsProps) {
     </SheetContent>
   </Sheet >
 
-  const loadButton = <Sheet>
+  const loadButton = <Sheet key="load">
     <SheetTrigger asChild>
       {
         Object.keys(tanks).length > 0 &&
