@@ -112,9 +112,11 @@ export function TankDetailsControls({ form }: TankDetailsControlsProps) {
         </div>
       </div>
       <SheetFooter>
-        <Button type="button" disabled={newTankName.length === 0} onClick={() => saveTankDetails(newTankName)}>
-          Save
-        </Button>
+        <SheetClose>
+          <Button className="w-full" type="button" disabled={newTankName.length === 0} onClick={() => saveTankDetails(newTankName)}>
+            Save
+          </Button>
+        </SheetClose>
       </SheetFooter>
     </SheetContent>
   </Sheet >
@@ -138,9 +140,11 @@ export function TankDetailsControls({ form }: TankDetailsControlsProps) {
           Object.entries(tanks).map((entry, index) => {
             const [tankName, data] = entry;
             return <div key={index} className="flex justify-between items-center">
-              <Button onClick={() => restoreTankDetails(data)} variant="link">
-                {tankName}
-              </Button>
+              <SheetClose>
+                <Button onClick={() => restoreTankDetails(data)} variant="link">
+                  {tankName}
+                </Button>
+              </SheetClose>
               <Button variant="destructive" size="sm" onClick={() => deleteSavedTank(tankName)}>-</Button>
             </div>
           })
