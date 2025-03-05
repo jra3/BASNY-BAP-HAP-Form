@@ -60,6 +60,12 @@
     --chart-5: hsl(340 75% 55%);
 }
 
+#official {
+    /* settings to force browsers to print background colors */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);

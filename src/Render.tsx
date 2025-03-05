@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from './lib/utils';
 import { isLivestock } from './Schema';
 
-const formCell = cn("flex", "flex-1", "border", "border-black", "h-6");
+const formCell = cn("flex", "flex-1", "border", "border-black", "h-6", "items-center");
 const label = cn("block", "font-extralight", "text-xs");
 const valueText = cn("block", "font-semibold");
 
@@ -19,8 +19,8 @@ const PrintPage = () => {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white">
-      <h2 className="text-xl font-bold text-center mb-6">BROOKLYN AQUARIUM SOCIETY - BAP / HAP SUBMISSION FORM</h2>
+    <div className="max-w-3xl mx-auto bg-white">
+      <h2 className="text-xl font-bold text-center">BROOKLYN AQUARIUM SOCIETY - BAP / HAP SUBMISSION FORM</h2>
 
       <div className='flex-col'>
         <div className={formCell}>
@@ -144,8 +144,7 @@ const PrintPage = () => {
           <span className={cn(valueText, "ml-4")}>{formData.CO2Description}</span>
         </div>
 
-
-        <div className='flex mt-4'>
+        <div className='flex mt-2'>
           <div className={formCell}>
             <span className={cn(label)}>WITNESSED BY</span>
           </div>
@@ -154,7 +153,7 @@ const PrintPage = () => {
           </div>
         </div>
 
-        <div className="bg-indigo-200">
+        <div id="official" className="bg-indigo-300">
           {
             [
               ["ARTICLE SUBMITTED", "# OF PAGES"],
@@ -176,7 +175,6 @@ const PrintPage = () => {
             )
           }
         </div>
-
       </div>
     </div>
   );
