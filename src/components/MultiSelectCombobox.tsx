@@ -57,13 +57,16 @@ export default function MultiSelectCombobox(attrs: MultiSelectComboboxProps) {
             "w-full",
             "justify-between",
             weight,
-          )}
-        >
-          {selected.map(
-            value => {
-              const selected = options.find(option => option === value);
-              return selected || value;
-            }).sort().join(", ") || attrs.placeholder || "Select options"}
+          )}>
+
+          {
+            selected.map(
+              value => {
+                const selected = options.find(option => option === value);
+                return selected || value;
+              }).sort().join(", ") || attrs.placeholder || "Select options"
+          }
+
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

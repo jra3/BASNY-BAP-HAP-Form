@@ -22,7 +22,7 @@ const renderTextField = (label: string, placeholder: string) =>
     <FormItem>
       <FormLabel>{label}</FormLabel>
       <FormControl>
-        <Input placeholder={placeholder} {...field} />
+        <Input className="bg-white" placeholder={placeholder} {...field} />
       </FormControl>
       <FormMessage />
     </FormItem>
@@ -30,11 +30,11 @@ const renderTextField = (label: string, placeholder: string) =>
 
 const renderSelectField = (label: string, options: string[], placeholder = "") => {
   return ({ field }: { field: ControllerRenderProps<any, any> }) => (
-    <FormItem className='w-full'>
+    <FormItem className="w-full">
       <Select onValueChange={field.onChange} defaultValue={field.value}>
         <FormLabel>{label}</FormLabel>
         <FormControl>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full bg-white">
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
         </FormControl>
@@ -83,7 +83,7 @@ export default function BapForm() {
   }, [speciesType]);
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-2xl">
+    <div className="max-w-lg mx-auto p-6 shadow-lg rounded-2xl bg-green-300">
       <h2 className="text-2xl font-semibold mb-4 text-center">BAP/HAP Submission</h2>
 
       <Form {...form} >
@@ -91,7 +91,7 @@ export default function BapForm() {
 
           <FormField control={form.control} name="memberName" render={renderTextField("Member Name", "Jacques Cousteau...")} />
 
-          <Card id="species-details">
+          <Card id="species-details" className="bg-green-100">
             <CardHeader>
               <CardTitle>Species Details</CardTitle>
             </CardHeader>
@@ -172,7 +172,7 @@ export default function BapForm() {
             </CardContent >
           </Card >
 
-          <Card id="tank-details">
+          <Card id="tank-details" className="bg-green-100">
             <CardHeader>
               <CardTitle>Tank Details</CardTitle>
             </CardHeader>
@@ -212,7 +212,7 @@ export default function BapForm() {
 
           {
             !isLivestock(speciesType) &&
-            <Card id='plant-coral-supplemental'>
+            <Card id='plant-coral-supplemental' className='bg-green-100'>
               <CardHeader>
                 <CardTitle>Fertilizers & Supplements</CardTitle>
               </CardHeader>
@@ -251,7 +251,7 @@ export default function BapForm() {
                           ].map((option, index) => (
                             <FormItem className="flex items-center space-x-3 space-y-0" key={index}>
                               <FormControl>
-                                <RadioGroupItem value={option[1]} checked={option[1] === form.getValues().CO2} />
+                                <RadioGroupItem className="bg-white" value={option[1]} checked={option[1] === form.getValues().CO2} />
                               </FormControl>
                               <FormLabel className="font-normal">
                                 {option[0]}

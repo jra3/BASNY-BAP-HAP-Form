@@ -19,6 +19,7 @@ export default function FertilizerInput(props: Props) {
       return <div className="flex gap-2" key={`fert${index}`}>
         <Input
           placeholder="Fertilizer / Supplement"
+          className="bg-white"
           value={substance}
           onChange={(e) => {
             const newFerts = ferts;
@@ -30,6 +31,7 @@ export default function FertilizerInput(props: Props) {
 
         <Input
           placeholder="How much / How often"
+          className="bg-white"
           value={regimen}
           onChange={(e) => {
             const newFerts = ferts;
