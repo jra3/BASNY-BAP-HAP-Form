@@ -154,6 +154,7 @@ const PrintPage = () => {
         </div>
 
         <div id="official" className="bg-indigo-300">
+          <span className={valueText}>OFFICIAL USE</span>
           {
             [
               ["ARTICLE SUBMITTED", "# OF PAGES"],
