@@ -154,7 +154,7 @@ const PrintPage = () => {
         </div>
 
         <div id="official" className="bg-indigo-300">
-          <span className={valueText}>OFFICIAL USE</span>
+          <span className={cn(valueText, 'text-center')}>DO NOT WRITE BELOW THIS LINE ----- OFFICIAL USE ONLY</span>
           {
             [
               ["ARTICLE SUBMITTED", "# OF PAGES"],
