@@ -68,7 +68,7 @@ export const bapSchema = z.object({
   memberName: z.string().min(1),
   waterType: z.enum(["Fresh", "Brackish", "Salt"]),
   speciesType: z.enum(["Fish", "Invert", "Plant", "Coral"]),
-  date: z.date(),
+  date: z.string().min(1),
   classification: z.string().min(1),
   speciesLatinName: z.string().min(1),
   speciesCommonName: z.string().min(1),

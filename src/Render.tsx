@@ -41,7 +41,7 @@ const PrintPage = () => {
         <div className='flex'>
           <div className={formCell}>
             <span className={cn(label, "mr-1")}>DATE SPAWNED / PROPAGATED</span>
-            <span className={valueText}>{formData.date.toDateString()}</span>
+            <span className={valueText}>{formData.date}</span>
           </div>
           <div className={formCell}>
             <span className={cn(label, "mr-1")}>CLASS</span>

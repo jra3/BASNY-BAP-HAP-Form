@@ -13,7 +13,7 @@ const defaultValues: FormValues = {
 
   speciesType: "Fish",
   waterType: "Fresh",
-  date: new Date(),
+  date: "",
   speciesLatinName: "",
   speciesCommonName: "",
   classification: "",

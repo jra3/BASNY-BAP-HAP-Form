@@ -50,11 +50,9 @@ const renderSelectField = (label: string, options: string[], placeholder = "") =
     </FormItem>
   );
 };
-
 export default function BapForm() {
   const { formData, setFormData } = useFormContext();
   const navigate = useNavigate();
-
 
   const form = useForm<FormValues>({
     resolver: zodResolver(bapSchema),
@@ -108,7 +106,6 @@ export default function BapForm() {
                   control={form.control}
                   name="waterType"
                   render={renderSelectField("Water Type", ["Fresh", "Brackish", "Salt"])} />
-
               </div >
 
               <FormField
@@ -118,6 +115,7 @@ export default function BapForm() {
 
               <FormField control={form.control} name="speciesCommonName" render={renderTextField("Species Common Name", "Guppy")} />
               <FormField control={form.control} name="speciesLatinName" render={renderTextField("Species Latin Name", "Poecilia Reticulata")} />
+              <FormField control={form.control} name="date" render={renderTextField("Date Spawned / Propagated", "2025 / 03 / 14")} />
 
               {
                 (function () {
